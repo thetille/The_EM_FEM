@@ -55,7 +55,7 @@ end
 [~, idx_sort] = sort(idx_ipt);
 
 idx_ipt = idx_ipt(idx_sort);
-idx_DB = idx_DB(idx_sort);
+idx_DB = idx_DB(idx_sort)';
 
 % ------------------------------------------------------------------
 % Sanity check (Adds about 10% execution time...)

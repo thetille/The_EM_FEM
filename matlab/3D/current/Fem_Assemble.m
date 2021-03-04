@@ -24,9 +24,9 @@ edNumGlo = ElementDatabase_Cardinal('edges');
 faNumGlo = ElementDatabase_Cardinal('faces');
 
 % Incremental steps for each element
-incRes_EE = 6*6;
-incRes_FE = 4*6;
-incRes_FF = 4*4;
+incRes_EE = 6*6; % edge * edge
+incRes_FE = 4*6; % face * edge 
+incRes_FF = 4*4; % face * face
 
 % Initializing.
 idxRes_EE = 1;
@@ -49,27 +49,28 @@ mmRes_FF = zeros(incRes_FF*elNumGlo,1);
 
 % Computing the contributions to the mass and
 % stiffness matrices.
-for elIdx = 1:elNumGlo
+for elIdx = 1:elNumGlo % goes throug the amount of thetras
     
-    no = el2no(:,elIdx);
-    xyz = no2xyz(:,no);
+    no = el2no(:,elIdx); % nodes for the specific thetra 
+    xyz = no2xyz(:,no); % coordinates for the nodes (4 nodes)
     
     [eElMtx_EE, sElMtx_EE, cElMtx_FE, uElMtx_FF] = ...
         Fem_CmpElMtx(xyz, ma2er{el2ma(elIdx)}, ma2si{el2ma(elIdx)});
+    %for edges
+    noTmp = zeros(size(ed2noLoc)); % temp var of size of the amount of initial base lines (edges) 
+    noTmp(:) = el2no(ed2noLoc(:),elIdx); % temp var with initial base edge nodes (one edge has 2 nodes ie 6x2)
+    esVtr = sign(noTmp(2,:)-noTmp(1,:)); % each edge gest an assigned direction based on node id (this is random)is only used as initial value
+    eiVtr = ElementDatabase_Get('edges', noTmp); % each edge assosiated with the specific thetra
     
-    noTmp = zeros(size(ed2noLoc));
-    noTmp(:) = el2no(ed2noLoc(:),elIdx);
-    esVtr = sign(noTmp(2,:)-noTmp(1,:));
-    eiVtr = ElementDatabase_Get('edges', noTmp);
-    
-    noTmp = zeros(size(fa2noLoc));
-    noTmp(:) = el2no(fa2noLoc(:),elIdx);
-    fsVtr = 2*(...
+    %for faces
+    noTmp = zeros(size(fa2noLoc)); % temp var of size of the amount of initial faces
+    noTmp(:) = el2no(fa2noLoc(:),elIdx); % temp var with initial nodes of each face
+    fsVtr = 2*(... % each edge gets a normal vector, initial direction is based on index only
         ((noTmp(1,:) < noTmp(2,:)) & (noTmp(2,:) < noTmp(3,:))) | ...
         ((noTmp(2,:) < noTmp(3,:)) & (noTmp(3,:) < noTmp(1,:))) | ...
         ((noTmp(3,:) < noTmp(1,:)) & (noTmp(1,:) < noTmp(2,:))) ...
         ) - 1;
-    fiVtr = ElementDatabase_Get('faces', noTmp);
+    fiVtr = ElementDatabase_Get('faces', noTmp); % gets ids for faces assosiated with the specific thetra
         
     irTmp_EE = eiVtr'*ones(size(eiVtr));
     icTmp_EE = ones(size(eiVtr'))*eiVtr;
