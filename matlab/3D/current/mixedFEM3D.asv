@@ -75,10 +75,10 @@ else
 end
 
 eigVal = diag(eigVal); % j*w/c0, converts matrix to vector
-[eigTmp, eigIdx_sort] = sort(real(-1i*eigVal)); % sorts igenvalues after imag amplitude
-eigVal     = -1i*eigVal(eigIdx_sort); % w/c0c, selects the largest eigenvalues
+[eigTmp, eigIdx_sort] = sort(real(-1i*eigVal)); % 
+eigVal     = -1i*eigVal(eigIdx_sort); % w/c0
 eigVtr_int = eigVtr_int(:,eigIdx_sort);
-fr = c0*eigVal/(2*pi); % eigenfrequency
+fr = c0*eigVal/(2*pi);
 
 
 %% Dsiplays all data

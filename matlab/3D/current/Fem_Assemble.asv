@@ -23,12 +23,12 @@ elNumGlo = size(el2no,2); % number of thetras
 edNumGlo = ElementDatabase_Cardinal('edges'); % Number of edges / lines
 faNumGlo = ElementDatabase_Cardinal('faces'); % number of faces / triangles
 
-% Incremental steps for each element in idxRes_EE, idxRes_FE, idxRes_FF
+% Incremental of data snippets for each element in idxRes_EE, idxRes_FE, idxRes_FF
 incRes_EE = 6*6; % edge * edge
 incRes_FE = 4*6; % face * edge 
 incRes_FF = 4*4; % face * face
 
-% Initializing. Current step, starts in 1 instead of 0 due to matlab
+% Initializing. Current location based on step, starts in 1 instead of 0 due to matlab
 % properties
 idxRes_EE = 1;
 idxRes_FE = 1;
@@ -52,7 +52,7 @@ muRes_FF = zeros(incRes_FF*elNumGlo,1); % pre allocation for data in uMtx
 % stiffness matrices.
 for elIdx = 1:elNumGlo % goes throug the amount of thetras
     
-    no = el2no(:,elIdx); % nodes for the specific thetra 
+    no = el2no(:,elIdx); % current nodes (corners / points)
     xyz = no2xyz(:,no); % coordinates for the nodes (4 nodes)
     
     [eElMtx_EE, sElMtx_EE, cElMtx_FE, uElMtx_FF] = ...
@@ -61,32 +61,35 @@ for elIdx = 1:elNumGlo % goes throug the amount of thetras
     noTmp = zeros(size(ed2noLoc)); % temp var of size of the amount of initial base lines (edges) 
     noTmp(:) = el2no(ed2noLoc(:),elIdx); % temp var with initial base edge nodes (one edge has 2 nodes ie 6x2)
     esVtr = sign(noTmp(2,:)-noTmp(1,:)); % each edge gest an assigned direction based on node id (this is random)is only used as initial value
-    eiVtr = ElementDatabase_Get('edges', noTmp); % each edge assosiated with the specific thetra
+    eiVtr = ElementDatabase_Get('edges', noTmp); % each edge id assosiated with the specific thetra (6 edges)
     
     %for faces
     noTmp = zeros(size(fa2noLoc)); % temp var of size of the amount of initial faces
     noTmp(:) = el2no(fa2noLoc(:),elIdx); % temp var with initial nodes of each face
-    fsVtr = 2*(... % each edge gets a normal vector, initial direction is based on index only
+    fsVtr = 2*(... % each face gets a normal vector, initial direction is based on index only
         ((noTmp(1,:) < noTmp(2,:)) & (noTmp(2,:) < noTmp(3,:))) | ...
         ((noTmp(2,:) < noTmp(3,:)) & (noTmp(3,:) < noTmp(1,:))) | ...
         ((noTmp(3,:) < noTmp(1,:)) & (noTmp(1,:) < noTmp(2,:))) ...
         ) - 1;
     fiVtr = ElementDatabase_Get('faces', noTmp); % gets ids for faces assosiated with the specific thetra
-        
-    irTmp_EE = eiVtr'*ones(size(eiVtr));
-    icTmp_EE = ones(size(eiVtr'))*eiVtr;
-    isTmp_EE = esVtr'*esVtr;
     
-    irTmp_FE = fiVtr'*ones(size(eiVtr));
-    icTmp_FE = ones(size(fiVtr'))*eiVtr;
-    isTmp_FE = fsVtr'*esVtr;
+    % edges only
+    irTmp_EE = eiVtr'*ones(size(eiVtr)); % row index for eMtx only based on edge id
+    icTmp_EE = ones(size(eiVtr'))*eiVtr; % column index for eMtx only based on edge id
+    isTmp_EE = esVtr'*esVtr; % The direction adjusted for the eElMtx_EE and sElMtx_EE matrix
     
-    irTmp_FF = fiVtr'*ones(size(fiVtr));
-    icTmp_FF = ones(size(fiVtr'))*fiVtr;
-    isTmp_FF = fsVtr'*fsVtr;
+    % faces and edges
+    irTmp_FE = fiVtr'*ones(size(eiVtr)); % row index for cMtx only based on face and edge id
+    icTmp_FE = ones(size(fiVtr'))*eiVtr;  % column index for cMtx only based on face and edge id
+    isTmp_FE = fsVtr'*esVtr; % The direction adjusted for the cElMtx_FE matrix
     
-    irRes_EE(idxRes_EE + (1:incRes_EE) - 1) = irTmp_EE(:);
-    icRes_EE(idxRes_EE + (1:incRes_EE) - 1) = icTmp_EE(:);
+    % faces only
+    irTmp_FF = fiVtr'*ones(size(fiVtr)); % row index for uMtx only based on face id
+    icTmp_FF = ones(size(fiVtr'))*fiVtr; % column index for uMtx only based on face id
+    isTmp_FF = fsVtr'*fsVtr; % The direction adjusted for the uElMtx_FF matrix
+    
+    irRes_EE(idxRes_EE + (1:incRes_EE) - 1) = irTmp_EE(:); % includes all row indexes for all thetras for eMtx and sMtx
+    icRes_EE(idxRes_EE + (1:incRes_EE) - 1) = icTmp_EE(:); % includes all column ind
     meRes_EE(idxRes_EE + (1:incRes_EE) - 1) = isTmp_EE(:).*eElMtx_EE(:);
     msRes_EE(idxRes_EE + (1:incRes_EE) - 1) = isTmp_EE(:).*sElMtx_EE(:);
     
@@ -104,7 +107,7 @@ for elIdx = 1:elNumGlo % goes throug the amount of thetras
     
 end
 
-eMtx = sparse(irRes_EE, icRes_EE, meRes_EE, edNumGlo, edNumGlo);
-sMtx = sparse(irRes_EE, icRes_EE, msRes_EE, edNumGlo, edNumGlo);
-cMtx = sparse(irRes_FE, icRes_FE, mcRes_FE, faNumGlo, edNumGlo);
-uMtx = sparse(irRes_FF, icRes_FF, muRes_FF, faNumGlo, faNumGlo);
+eMtx = sparse(irRes_EE, icRes_EE, meRes_EE, edNumGlo, edNumGlo); % M^{epsilon}
+sMtx = sparse(irRes_EE, icRes_EE, msRes_EE, edNumGlo, edNumGlo); % M^{sigma}
+cMtx = sparse(irRes_FE, icRes_FE, mcRes_FE, faNumGlo, edNumGlo); % C
+uMtx = sparse(irRes_FF, icRes_FF, muRes_FF, faNumGlo, faNumGlo); % M^{1}
