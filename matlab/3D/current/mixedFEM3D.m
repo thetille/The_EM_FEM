@@ -1,8 +1,5 @@
 clear all
 
-% Select the modes that will be visualized
-mVtr = 1151 + (1:20);
-
 % Direct or sparse eigenvalue solver for small and large
 % problems, respectively [solver = 'direct' or 'sparse']
 solver = 'direct';
@@ -82,6 +79,12 @@ eigVal     = -1i*eigVal(eigIdx_sort); % w/c0
 eigVtr_int = eigVtr_int(:,eigIdx_sort);
 fr = c0*eigVal/(2*pi);
 
+
+%% Dsiplays all data
+
+% Select the modes that will be visualized
+mVtr = 1151 + (1:20);
+
 % Visualize the eigenfrequencies
 figure(1), clf
 plot(real(fr(mVtr))/1e9, imag(fr(mVtr))/1e9, 'ks')
@@ -104,6 +107,8 @@ bzFld_all = (pMtx_fa2no.zc*bFld_all) / c0;
 exFld_all = pMtx_ed2no.xc*eFld_all;
 eyFld_all = pMtx_ed2no.yc*eFld_all;
 ezFld_all = pMtx_ed2no.zc*eFld_all;
+
+
 
 for mIdx = mVtr
     figure(2), clf
@@ -132,5 +137,4 @@ for mIdx = mVtr
     axis equal
     axis off
     view(-24,14)
-    pause
 end

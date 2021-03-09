@@ -23,12 +23,12 @@ elNumGlo = size(el2no,2); % number of thetras
 edNumGlo = ElementDatabase_Cardinal('edges'); % Number of edges / lines
 faNumGlo = ElementDatabase_Cardinal('faces'); % number of faces / triangles
 
-% Incremental of data snippets for each element in idxRes_EE, idxRes_FE, idxRes_FF
+% Incremental steps for each element in idxRes_EE, idxRes_FE, idxRes_FF
 incRes_EE = 6*6; % edge * edge
 incRes_FE = 4*6; % face * edge 
 incRes_FF = 4*4; % face * face
 
-% Initializing. Current location based on step, starts in 1 instead of 0 due to matlab
+% Initializing. Current step, starts in 1 instead of 0 due to matlab
 % properties
 idxRes_EE = 1;
 idxRes_FE = 1;
@@ -52,7 +52,7 @@ muRes_FF = zeros(incRes_FF*elNumGlo,1); % pre allocation for data in uMtx
 % stiffness matrices.
 for elIdx = 1:elNumGlo % goes throug the amount of thetras
     
-    no = el2no(:,elIdx); % current nodes (corners / points)
+    no = el2no(:,elIdx); % nodes for the specific thetra 
     xyz = no2xyz(:,no); % coordinates for the nodes (4 nodes)
     
     [eElMtx_EE, sElMtx_EE, cElMtx_FE, uElMtx_FF] = ...

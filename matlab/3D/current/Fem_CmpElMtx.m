@@ -34,12 +34,13 @@ q2w = [4.166666666666666e-02; ...
        4.166666666666666e-02]';
 
 % H(grad) basis functions
+% Node basis functions for the reference element
 up{1} = 1 - q2u(1,:) - q2u(2,:) - q2u(3,:);
 up{2} = q2u(1,:);
 up{3} = q2u(2,:);
 up{4} = q2u(3,:);
 
-% Gradient of H(grad) basis functions
+% Gradient of H(grad) basis functions, used in H(div), H(curl)
 ug{1} = [-1 -1 -1]';
 ug{2} = [+1 0 0]';
 ug{3} = [0 +1 0]';
@@ -77,8 +78,9 @@ ucn{5} = 2*cross(ug{2},ug{4})*ouTmp;
 ucn{6} = 2*cross(ug{3},ug{4})*ouTmp;
 
 % Physical coordinates
-q2x = zeros(3,length(q2w));
-for iIdx = 1:4
+% Maps from refference element to physical element
+q2x = zeros(3,length(q2w)); % allocate memorry
+for iIdx = 1:4 % 4 edge points
     q2x = q2x + xyz(:,iIdx)*up{iIdx};
 end
 
@@ -99,11 +101,14 @@ for iIdx = 1:6
     gin{iIdx} = map_ccs*uin{iIdx};
     gcn{iIdx} = map_dcs*ucn{iIdx};
 end
+
+% 
 for iIdx = 1:4
     gim{iIdx} = map_dcs*uim{iIdx};
 end
 
 % Evaluation of element matrix: epsilon Ni Nj
+% M^{epsilon}_{ij}
 for iIdx = 1:6
     for jIdx = 1:6
         maTmp = ma2er(q2x(1,:),q2x(2,:),q2x(3,:));
@@ -113,6 +118,7 @@ for iIdx = 1:6
 end
 
 % Evaluation of element matrix: sigma Ni Nj
+% M^{sigma}_{ij}
 for iIdx = 1:6
     for jIdx = 1:6
         maTmp = ma2si(q2x(1,:),q2x(2,:),q2x(3,:));
@@ -122,6 +128,7 @@ for iIdx = 1:6
 end
 
 % Evaluation of element matrix: Mi curl_Nj
+    % C_{ij}
 for iIdx = 1:4
     for jIdx = 1:6
         maTmp = ones(size(q2w));
@@ -131,6 +138,7 @@ for iIdx = 1:4
 end
 
 % Evaluation of element matrix: Mi Mj
+% M^{1}_{ij}
 for iIdx = 1:4
     for jIdx = 1:4
         maTmp = ones(size(q2w));
