@@ -2,7 +2,7 @@ clear all
 
 % Direct or sparse eigenvalue solver for small and large
 % problems, respectively [solver = 'direct' or 'sparse']
-solver = 'direct';
+solver = 'sparse';
 
 % Materials
 ma2er = {@(x,y,z) 1 + 4*exp(-((x-0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
@@ -85,10 +85,12 @@ fr = c0*eigVal/(2*pi); % eigenfrequency
 
 
 % Select the modes that will be visualized
-mVtr = 1151 + (1:20);
+if solver == 'sparse'
+    mVtr = 1:30;
+else
+  mVtr = 1151 + (1:20);
+end
 
-solIdx_bFld = 1:faNum_dof; 
-solIdx_eFld = faNum_dof + (1:edNum_dof);
 
 % Visualize the eigenfrequencies
 figure(1), clf
@@ -98,10 +100,13 @@ ylabel('Imaginary part of eigenfrequency [GHz]')
 grid on
 
 % Visualize the eigenmodes
-bFld_all = eigVtr_int(solIdx_bFld,:);
+solIdx_bFld = 1:faNum_dof; % The solution for the magnetic field  
+solIdx_eFld = faNum_dof + (1:edNum_dof); % the solution for the electric field
 
-eFld_all = zeros(edNum_all,size(eigVtr_int,2));
-eFld_all(edIdx_int,:) = eigVtr_int(solIdx_eFld,:);
+bFld_all = eigVtr_int(solIdx_bFld,:); % interiour magnetic field
+
+eFld_all = zeros(edNum_all,size(eigVtr_int,2)); % prealocates memmory and includes edges which are PEC. PEC are zero
+eFld_all(edIdx_int,:) = eigVtr_int(solIdx_eFld,:); % sets all interieor edges to eigenvector value
 
 [pMtx_ed2no, pMtx_fa2no] = ProjSol2Nodes_Assemble(no2xyz, el2no);
 
