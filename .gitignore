@@ -22,3 +22,6 @@ octave-workspace
 
 # Google drive extension
 .ini
+
+# Python editor
+.spyproject/
