@@ -10,21 +10,25 @@
 %    ed2no_pec = edge to node for PEC
 function tethrahedron_mesh(file_name)
 % import stl file
-structure = importGeometry(file_name);
+model = createpde;
+structure = importGeometry(model,file_name);
 
 % plot stl file
 figure
 pdegplot(structure,'FaceLabels','on');
 
 % Mesh structure
+generateMesh(model);
+figure
+pdeplot3D(model);
 
 
 
 
 % return varibles
-no2xyz
-ed2no_all
-fa2no_all
-el2no
-el2ma
-ed2no_pec
+% no2xyz
+% ed2no_all
+% fa2no_all
+% el2no
+% el2ma
+% ed2no_pec
