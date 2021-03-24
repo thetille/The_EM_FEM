@@ -15,7 +15,9 @@ e0 = 1/(m0*c0^2);   % permittivity in vacuum
 z0 = sqrt(m0/e0);   % wave impedance in vacuum
 
 % Read mesh
-load mesh_cylinder_R1
+load waveguide_model2
+
+% ed2no_pec = [ed2no_port1, ed2no_port2, ed2no_bound];
 
 % Initialize the FEM
 Fem_Init(no2xyz, ed2no_all, fa2no_all)
@@ -119,10 +121,11 @@ eyFld_all = pMtx_ed2no.yc*eFld_all;
 ezFld_all = pMtx_ed2no.zc*eFld_all;
 
 
-
+dVal = max(no2xyz,[],'all')*1.2;
 for mIdx = mVtr
-    figure(2), clf
-    dVal = 0.4;
+    figure(2), clf;
+    
+    
     for dIdx = 0:1
         for edIdx = 1:size(ed2no_pec,2)
             noTmp = ed2no_pec(:,edIdx);
@@ -147,4 +150,24 @@ for mIdx = mVtr
     axis equal
     axis off
     view(-24,14)
+    title( sprintf('eigenfrequency [GHz]: %2.2f + %2.2fi',real(fr(mIdx))/1e9,imag(fr(mIdx))/1e9 ))
+    figure(3), clf;
+    
+    exViz = real(exFld_all(:,mIdx).');
+    eyViz = real(eyFld_all(:,mIdx).');
+    ezViz = real(ezFld_all(:,mIdx).');
+
+    X =  no2xyz(1,:);
+    Y =  no2xyz(2,:);
+    Z =  no2xyz(3,:);
+
+    V = exViz.^2+eyViz.^2+ezViz.^2;
+
+    res = [0.005,0.005,0.005];
+    [Xq,Yq,Zq] = meshgrid(-0.1:res(1):0.1, -.1:res(2):.1 ,0:res(3):0.4);
+    Vq = griddata(X,Y,Z,V,Xq,Yq,Zq);
+    slice(Xq,Yq,Zq,Vq,0,0,[0.1 0.3]);
+    shading flat
+    title(sprintf('eigenfrequency [GHz]: %2.2f + %2.2fi',real(fr(mIdx))/1e9,imag(fr(mIdx))/1e9 ))
+    
 end

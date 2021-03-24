@@ -1,21 +1,21 @@
 // Gmsh project created on Mon Mar 15 15:42:18 2021
 SetFactory("OpenCASCADE");
 //+
-Point(1) = {-1, 1, 0, 1.0};
+Point(1) = {-0.1, 0.1, 0, 1.0};
 //+
-Point(2) = {1, 1, 0, 1.0};
+Point(2) = {0.1, 0.1, 0, 1.0};
 //+
-Point(3) = {1, -1, 0, 1.0};
+Point(3) = {0.1, -0.1, 0, 1.0};
 //+
-Point(4) = {-1, -1, 0, 1.0};
+Point(4) = {-0.1, -0.1, 0, 1.0};
 //+
-Point(5) = {-0.9, 0.9, 0, 1.0};
+Point(5) = {-0.09, 0.09, 0, 1.0};
 //+
-Point(6) = {0.9, 0.9, 0, 1.0};
+Point(6) = {0.09, 0.09, 0, 1.0};
 //+
-Point(7) = {0.9, -0.9, 0, 1.0};
+Point(7) = {0.09, -0.09, 0, 1.0};
 //+
-Point(8) = {-0.9, -0.9, 0, 1.0};
+Point(8) = {-0.09, -0.09, 0, 1.0};
 //+
 Line(1) = {1, 2};
 //+
@@ -61,23 +61,23 @@ Curve Loop(5) = {3, -11, -8, 7};
 //+
 Plane Surface(5) = {5};
 //+
-Extrude {0, 0, 4} {
+Extrude {0, 0, 0.4} {
   Surface{1}; 
 }
 //+
-Extrude {0, 0, 4} {
+Extrude {0, 0, 0.4} {
   Surface{2}; 
 }
 //+
-Extrude {0, 0, 4} {
+Extrude {0, 0, 0.4} {
   Surface{3}; 
 }
 //+
-Extrude {0, 0, 4} {
+Extrude {0, 0, 0.4} {
   Surface{4}; 
 }
 //+
-Extrude {0, 0, 4} {
+Extrude {0, 0, 0.4} {
   Surface{5}; 
 }
 //+
@@ -96,3 +96,15 @@ Physical Surface("port1", 55) = {30};
 Physical Surface("port2", 56) = {5};
 //+
 Physical Surface("test", 57) = {12, 21, 16, 8};
+//+
+Physical Surface("bound", 58) = {1, 2, 3, 4, 10, 15, 20, 25};
+//+
+Physical Surface("bound", 58) += {6};
+//+
+Physical Surface("bound", 58) += {14};
+//+
+Physical Surface("bound", 58) += {21, 18};
+//+
+Physical Surface(" bound", 58) -= {21};
+//+
+Physical Surface("bound", 58) += {23};
