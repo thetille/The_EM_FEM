@@ -46,19 +46,19 @@ ug{2} = [+1 0 0]';
 ug{3} = [0 +1 0]';
 ug{4} = [0 0 +1]';
 
-% H(div) basis functions
-uim{1} = 2*(  cross(ug{2},ug{1})*up{3} ...
-            + cross(ug{1},ug{3})*up{2} ...
-            + cross(ug{3},ug{2})*up{1});
-uim{2} = 2*(  cross(ug{2},ug{4})*up{1} ...
-            + cross(ug{4},ug{1})*up{2} ...
-            + cross(ug{1},ug{2})*up{4});
-uim{3} = 2*(  cross(ug{3},ug{4})*up{2} ...
-            + cross(ug{4},ug{2})*up{3} ...
-            + cross(ug{2},ug{3})*up{4});
-uim{4} = 2*(  cross(ug{1},ug{4})*up{3} ...
-            + cross(ug{4},ug{3})*up{1} ...
-            + cross(ug{3},ug{1})*up{4});
+% % H(div) basis functions
+% uim{1} = 2*(  cross(ug{2},ug{1})*up{3} ...
+%             + cross(ug{1},ug{3})*up{2} ...
+%             + cross(ug{3},ug{2})*up{1});
+% uim{2} = 2*(  cross(ug{2},ug{4})*up{1} ...
+%             + cross(ug{4},ug{1})*up{2} ...
+%             + cross(ug{1},ug{2})*up{4});
+% uim{3} = 2*(  cross(ug{3},ug{4})*up{2} ...
+%             + cross(ug{4},ug{2})*up{3} ...
+%             + cross(ug{2},ug{3})*up{4});
+% uim{4} = 2*(  cross(ug{1},ug{4})*up{3} ...
+%             + cross(ug{4},ug{3})*up{1} ...
+%             + cross(ug{3},ug{1})*up{4});
     
 % H(curl) basis function
 uin{1} = ug{2}*up{1} - ug{1}*up{2};
@@ -103,16 +103,16 @@ for iIdx = 1:6
 end
 
 % 
-for iIdx = 1:4
-    gim{iIdx} = map_dcs*uim{iIdx};
-end
+% for iIdx = 1:4
+%     gim{iIdx} = map_dcs*uim{iIdx};
+% end
 
 % Evaluation of element matrix: curl_Ni curl_Nj
 % A_{ij}
 for iIdx = 1:6
     for jIdx = 1:6
         maTmp = ones(size(q2w));
-        ipTmp = maTmp.*sum(gcn{iIdx}.*flip(gcn{iIdx}));
+        ipTmp = maTmp.*sum(gcn{iIdx}.*gcn{jIdx});
         AElMtx_EE(iIdx,jIdx) = ipTmp * q2w' * det_jac;
     end
 end
@@ -122,7 +122,7 @@ end
 for iIdx = 1:6
     for jIdx = 1:6
         maTmp = ma2er(q2x(1,:),q2x(2,:),q2x(3,:));
-        ipTmp = maTmp.*sum(gin{iIdx}.*flip(gin{jIdx}));
+        ipTmp = maTmp.*sum(gin{iIdx}.*gin{jIdx});
         BElMtx_EE(iIdx,jIdx) = ipTmp * q2w' * det_jac;
     end
 end

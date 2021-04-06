@@ -64,14 +64,14 @@ for elIdx = 1:elNumGlo % goes throug the amount of thetras
     eiVtr = ElementDatabase_Get('edges', noTmp); % each edge id assosiated with the specific thetra (6 edges)
     
     %for faces
-    noTmp = zeros(size(fa2noLoc)); % temp var of size of the amount of initial faces
-    noTmp(:) = el2no(fa2noLoc(:),elIdx); % temp var with initial nodes of each face
-    fsVtr = 2*(... % each face gets a normal vector, initial direction is based on index only
-        ((noTmp(1,:) < noTmp(2,:)) & (noTmp(2,:) < noTmp(3,:))) | ...
-        ((noTmp(2,:) < noTmp(3,:)) & (noTmp(3,:) < noTmp(1,:))) | ...
-        ((noTmp(3,:) < noTmp(1,:)) & (noTmp(1,:) < noTmp(2,:))) ...
-        ) - 1;
-    fiVtr = ElementDatabase_Get('faces', noTmp); % gets ids for faces assosiated with the specific thetra
+%     noTmp = zeros(size(fa2noLoc)); % temp var of size of the amount of initial faces
+%     noTmp(:) = el2no(fa2noLoc(:),elIdx); % temp var with initial nodes of each face
+%     fsVtr = 2*(... % each face gets a normal vector, initial direction is based on index only
+%         ((noTmp(1,:) < noTmp(2,:)) & (noTmp(2,:) < noTmp(3,:))) | ...
+%         ((noTmp(2,:) < noTmp(3,:)) & (noTmp(3,:) < noTmp(1,:))) | ...
+%         ((noTmp(3,:) < noTmp(1,:)) & (noTmp(1,:) < noTmp(2,:))) ...
+%         ) - 1;
+    %fiVtr = ElementDatabase_Get('faces', noTmp); % gets ids for faces assosiated with the specific thetra
     
     % edges only
     irTmp_EE = eiVtr'*ones(size(eiVtr)); % row index for eMtx only based on edge id

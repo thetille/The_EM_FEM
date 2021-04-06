@@ -2,7 +2,8 @@ clear all
 
 % Direct or sparse eigenvalue solver for small and large
 % problems, respectively [solver = 'direct' or 'sparse']
-solver = 'sparse';
+solver = ['direct';'sparse'];
+solver = solver(1,:);
 
 % Materials
 ma2er = {@(x,y,z) 1};% + 4*exp(-((x-0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
@@ -15,8 +16,8 @@ e0 = 1/(m0*c0^2);   % permittivity in vacuum
 z0 = sqrt(m0/e0);   % wave impedance in vacuum
 
 % Read mesh
-file_list = ["cylinder_waveguide2", "waveguide_model2"]
-load(file_list(2))
+file_list = ["cylinder_waveguide2", "waveguide_model2","mesh_cylinder_R0"];
+load(file_list(3))
 
 % ed2no_pec = [ed2no_port1, ed2no_port2, ed2no_bound];
 
