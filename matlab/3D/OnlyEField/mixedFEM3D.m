@@ -2,7 +2,8 @@ clear all
 
 % Direct or sparse eigenvalue solver for small and large
 % problems, respectively [solver = 'direct' or 'sparse']
-solver = 'direct';
+solver = ['direct';'sparse'];
+solver = solver(2,:);
 
 % Materials
 ma2er = {@(x,y,z) 1};% + 4*exp(-((x-0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
@@ -36,7 +37,7 @@ noIdx_all = 1:size(no2xyz,2); % each node gets an id
 % Compute the interior edges
 edIdx_int = setdiff(edIdx_all, edIdx_pec); % removes all edges that are pec from the index
 noIdx_int = setdiff(noIdx_all, noIdx_pec); % removes all nodes that are pec from the index
-
+tic
 % Assemble global matrices
 [AMtx,BMtx] = ...
     Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2si);
@@ -73,7 +74,10 @@ if strcmp(solver, 'direct') % direct method
     % eigVtr_int are the eigenvectors
     % eigVal are the eigenvalues
 elseif strcmp(solver, 'sparse') % sparse method
-    [eigVtr_int, eigVal] = eigs(aMtx, 0.5*(bMtx+bMtx'), 30, 1i*(19.5+1i));
+    freq = 1.45; %find the igenvalues close to (in GHZ)
+    
+    [eigVtr_int, eigVal] = eigs(aMtx, 0.5*(bMtx+bMtx'), 30, ((freq*2*pi*1e9)/c0)^2);
+    toc
 else
     error('unknown eigenvalue solver')
 end
@@ -92,7 +96,7 @@ fr = c0*sqrt(eigVal)/(2*pi); % eigenfrequency
 if solver == 'sparse'
     mVtr = 1:30;
 else
-  mVtr = 333:length(fr)%length(no2xyz):length(fr);
+  mVtr = length(noIdx_int)+1:length(noIdx_int)+1+30;%length(fr)%length(no2xyz):length(fr);
 end
 
 
