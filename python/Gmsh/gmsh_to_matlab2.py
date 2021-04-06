@@ -23,7 +23,7 @@ name = name_list[1]
 gmsh.open(name.format(".geo"))
 
 def meshSizeCallback(dim, tag, x, y, z):
-    return 0.05 #- 0.15*z
+    return 0.08 - 0.15*z
 
 gmsh.model.mesh.setSizeCallback(meshSizeCallback)
 

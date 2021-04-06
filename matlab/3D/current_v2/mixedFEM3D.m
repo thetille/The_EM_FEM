@@ -5,8 +5,8 @@ clear all
 solver = 'sparse';
 
 % Materials
-ma2er = {@(x,y,z) 1 + 4*exp(-((x-0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
-ma2si = {@(x,y,z) 0.1*exp(-((x+0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
+ma2er = {@(x,y,z) 1};% + 4*exp(-((x-0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
+ma2si = {@(x,y,z) 0};%0.1*exp(-((x+0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
 
 % Constants
 c0 = 299792458;     % speed of light in vacuum
@@ -15,7 +15,8 @@ e0 = 1/(m0*c0^2);   % permittivity in vacuum
 z0 = sqrt(m0/e0);   % wave impedance in vacuum
 
 % Read mesh
-load waveguide_model2
+file_list = ["cylinder_waveguide2", "waveguide_model2"]
+load(file_list(2))
 
 % ed2no_pec = [ed2no_port1, ed2no_port2, ed2no_bound];
 
@@ -101,6 +102,18 @@ xlabel('Real part of eigenfrequency [GHz]')
 ylabel('Imaginary part of eigenfrequency [GHz]')
 grid on
 
+figure(2), clf
+%subplot(2,1,1)
+plot(real(fr(mVtr))/1e9,'X','DisplayName','Implementation')
+%subplot(2,1,2)
+hold on
+load("cst_data")
+plot(cst_data,'X','DisplayName','CST')
+xlabel('Modes []')
+ylabel('Frequency [GHz]')
+legend
+grid on
+
 % Visualize the eigenmodes
 solIdx_bFld = 1:faNum_dof; % The solution for the magnetic field  
 solIdx_eFld = faNum_dof + (1:edNum_dof); % the solution for the electric field
@@ -120,10 +133,10 @@ exFld_all = pMtx_ed2no.xc*eFld_all;
 eyFld_all = pMtx_ed2no.yc*eFld_all;
 ezFld_all = pMtx_ed2no.zc*eFld_all;
 
-
+%%
 dVal = max(no2xyz,[],'all')*1.2;
 for mIdx = mVtr
-    figure(2), clf;
+    figure(3), clf;
     
     
     for dIdx = 0:1
@@ -151,7 +164,8 @@ for mIdx = mVtr
     axis off
     view(-24,14)
     title( sprintf('eigenfrequency [GHz]: %2.2f + %2.2fi',real(fr(mIdx))/1e9,imag(fr(mIdx))/1e9 ))
-    figure(3), clf;
+    
+    
     
     exViz = real(exFld_all(:,mIdx).');
     eyViz = real(eyFld_all(:,mIdx).');
@@ -161,13 +175,23 @@ for mIdx = mVtr
     Y =  no2xyz(2,:);
     Z =  no2xyz(3,:);
 
-    V = exViz.^2+eyViz.^2+ezViz.^2;
-
-    res = [0.005,0.005,0.005];
-    [Xq,Yq,Zq] = meshgrid(-0.1:res(1):0.1, -.1:res(2):.1 ,0:res(3):0.4);
-    Vq = griddata(X,Y,Z,V,Xq,Yq,Zq);
-    slice(Xq,Yq,Zq,Vq,0,0,[0.1 0.3]);
-    shading flat
-    title(sprintf('eigenfrequency [GHz]: %2.2f + %2.2fi',real(fr(mIdx))/1e9,imag(fr(mIdx))/1e9 ))
+    phase_list = [1:-0.1:-1];
+    i = 1;
+    for phase = [phase_list flip(phase_list(1:end-1)) ]
+        figure(4), clf;
+        V = (phase*exViz).^2+(phase*eyViz).^2+(phase*ezViz).^2;
     
+        res = [0.005,0.005,0.005];
+        [Xq,Yq,Zq] = meshgrid(-0.1:res(1):0.1, -.1:res(2):.1 ,0:res(3):0.4);
+        Vq = griddata(X,Y,Z,V,Xq,Yq,Zq);
+
+        slice(Xq,Yq,Zq,Vq,0,0,[0.1 0.3]);
+        shading flat
+        title(sprintf('eigenfrequency [GHz]: %2.2f + %2.2fi',real(fr(mIdx))/1e9,imag(fr(mIdx))/1e9 ))
+        F(i) = getframe();
+        i = i+1;
+    end
+    figure(5)
+    movie(F,10)
 end
+

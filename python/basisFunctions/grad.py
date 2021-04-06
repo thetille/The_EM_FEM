@@ -67,9 +67,9 @@ for i,(w,v,u) in enumerate(zip(w_mesh,v_mesh,u_mesh)):
     N5[i,:] = -w*uhat+ u*what
     N6[i,:] = -w*vhat + v*what
     
-    M1[i,:] = 2*(u*uhat+v*vhat+(w-1)*what)
-    M2[i,:] = 2*(u*uhat+(v-1)*vhat+w*what)
-    M3[i,:] = 2*(u*uhat+(v-1)*vhat+w*what)
+    #M1[i,:] = 2*(u*uhat+v*vhat+(w-1)*what)
+    #M2[i,:] = 2*(u*uhat+(v-1)*vhat+w*what)
+    #M3[i,:] = 2*(u*uhat+(v-1)*vhat+w*what)
     
     
 #fig = plt.figure(figsize=plt.figaspect(0.25))
