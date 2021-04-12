@@ -40,7 +40,7 @@ noIdx_int = setdiff(noIdx_all, noIdx_pec); % removes all nodes that are pec from
 tic
 % Assemble global matrices
 [AMtx,BMtx] = ...
-    Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2si);
+    Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2si, ed2no_port1, ed2no_port2);
 
 % no2xyz = coordinates to all points
 % el2no = all points in a tetra
@@ -48,23 +48,14 @@ tic
 % ma2er = stores the permittivity associated with the different material indices
 % ma2si = storesthe conductivity associated with the different material indices
 
-eMtx_int = AMtx(edIdx_int,edIdx_int);%eMtx(edIdx_int,edIdx_int);    % mass matrix with permittivity of interiour
-sMtx_int = BMtx(edIdx_int,edIdx_int);%sMtx(edIdx_int,edIdx_int);    % mass matrix with conductivity of interiour
-%cMtx_int = cMtx(:,edIdx_int);            % curl matrix of interiour
-%uMtx_int = uMtx;          v               % mass matrix with unity coefficient of interiour
+eMtx_int = AMtx(edIdx_int,edIdx_int);   % mass matrix with permittivity of interiour
+sMtx_int = BMtx(edIdx_int,edIdx_int);    % mass matrix with conductivity of interiour
 
 edNum_dof = length(edIdx_int); % amount of interiour points
 faNum_dof = faNum_all; % total number of faces
 
 aMtx = eMtx_int;
 bMtx = sMtx_int;
-%aMtx = ... % A matrix from the eigenvalue problem of Az=lambdaBz
-%    [sparse(faNum_dof,faNum_dof) -cMtx_int; ...
-%    cMtx_int.' -z0*sMtx_int];
-
-%bMtx = ... % B matrix from the eigenvalue problem of Az=lambdaBz
-%    [uMtx_int sparse(faNum_dof,edNum_dof); ...
-%    sparse(edNum_dof,faNum_dof) eMtx_int];
 
 % Solve the eigenvalue problem
 if strcmp(solver, 'direct') % direct method

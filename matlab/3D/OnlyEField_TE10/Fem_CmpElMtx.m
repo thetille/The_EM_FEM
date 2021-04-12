@@ -2,18 +2,15 @@
 % Compute element matrices for the tetrahedron by means of
 % numerical integration on the reference element
 % --------------------------------------------------------------
-function [AElMtx_EE, BElMtx_EE] = ...
-    Fem_CmpElMtx(xyz, ma2er, ma2si)
+function [KElMtx_EE] = ...
+    Fem_CmpElMtx(xyz, ma2er, ma2si, k0)
 
 % Argument:
 %   xyz = the coordinates of the nodes of the element
 %   ma2er = material to permittivity
 %   ma2si = material to conductivity
-% Returns:
-%   eElMtx_EE = mass matrix with permittivity coefficient
-%   sElMtx_EE = mass matrix with conductivity coefficient
-%   cElMtx_FE = curl matrix
-%   uElMtx_FF = mass matrix with unity coefficient
+% Returns:   
+% KElMtx_EE = 
 
 % Quadrature rule
 q2u = [[5.854101966249685e-01, ...
@@ -102,67 +99,14 @@ for iIdx = 1:6
     gcn{iIdx} = map_dcs*ucn{iIdx};
 end
 
-% 
-% for iIdx = 1:4
-%     gim{iIdx} = map_dcs*uim{iIdx};
-% end
-
 % Evaluation of element matrix: curl_Ni curl_Nj
-% A_{ij}
+% K_{ij}
 for iIdx = 1:6
     for jIdx = 1:6
         maTmp = ones(size(q2w));
         ipTmp = maTmp.*sum(gcn{iIdx}.*gcn{jIdx});
-        AElMtx_EE(iIdx,jIdx) = ipTmp * q2w' * det_jac;
+        er = ma2er(q2x(1,:),q2x(2,:),q2x(3,:));
+        endTemp = k0^2*er. * sum(gin{iIdx}. * gin{jIdx});
+        KElMtx_EE(iIdx,jIdx) = (ipTmp - endTemp) * q2w' * det_jac;
     end
 end
-
-% Evaluation of element matrix: Ni Nj^T
-% B_{ij}
-for iIdx = 1:6
-    for jIdx = 1:6
-        maTmp = ma2er(q2x(1,:),q2x(2,:),q2x(3,:));
-        ipTmp = maTmp.*sum(gin{iIdx}.*gin{jIdx});
-        BElMtx_EE(iIdx,jIdx) = ipTmp * q2w' * det_jac;
-    end
-end
-
-% % Evaluation of element matrix: epsilon Ni Nj
-% % M^{epsilon}_{ij}
-% for iIdx = 1:6
-%     for jIdx = 1:6
-%         maTmp = ma2er(q2x(1,:),q2x(2,:),q2x(3,:));
-%         ipTmp = maTmp.*sum(gin{iIdx}.*gin{jIdx});
-%         eElMtx_EE(iIdx,jIdx) = ipTmp * q2w' * det_jac;
-%     end
-% end
-% 
-% % Evaluation of element matrix: sigma Ni Nj
-% % M^{sigma}_{ij}
-% for iIdx = 1:6
-%     for jIdx = 1:6
-%         maTmp = ma2si(q2x(1,:),q2x(2,:),q2x(3,:));
-%         ipTmp = maTmp.*sum(gin{iIdx}.*gin{jIdx});
-%         sElMtx_EE(iIdx,jIdx) = ipTmp * q2w' * det_jac;
-%     end
-% end
-% 
-% % Evaluation of element matrix: Mi curl_Nj
-%     % C_{ij}
-% for iIdx = 1:4
-%     for jIdx = 1:6
-%         maTmp = ones(size(q2w));
-%         ipTmp = maTmp.*sum(gim{iIdx}.*gcn{jIdx});
-%         cElMtx_FE(iIdx,jIdx) = ipTmp * q2w' * det_jac;
-%     end
-% end
-% 
-% % Evaluation of element matrix: Mi Mj
-% % M^{1}_{ij}
-% for iIdx = 1:4
-%     for jIdx = 1:4
-%         maTmp = ones(size(q2w));
-%         ipTmp = maTmp.*sum(gim{iIdx}.*gim{jIdx});
-%         uElMtx_FF(iIdx,jIdx) = ipTmp * q2w' * det_jac;
-%     end
-% end
