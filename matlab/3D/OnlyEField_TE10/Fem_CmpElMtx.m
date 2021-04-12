@@ -12,6 +12,8 @@ function [KElMtx_EE] = ...
 % Returns:   
 % KElMtx_EE = 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 3D %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Quadrature rule
 q2u = [[5.854101966249685e-01, ...
         1.381966011250105e-01, ...
@@ -98,6 +100,8 @@ for iIdx = 1:6
     gin{iIdx} = map_ccs*uin{iIdx};
     gcn{iIdx} = map_dcs*ucn{iIdx};
 end
+
+
 
 % Evaluation of element matrix: curl_Ni curl_Nj
 % K_{ij}
