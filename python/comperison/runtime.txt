@@ -1,0 +1,28 @@
+Only time the eignevalue solve. 60 eigenvalues
+for E field
+0.789068 seconds.
+0.601353 seconds.
+0.599181 seconds.
+0.582621 seconds.
+0.588692 seconds.
+0.697918 seconds.
+0.585873 seconds.
+0.598614 seconds.
+0.591521 seconds.
+0.868797 seconds.
+arvage
+0.65030638
+
+For E and H Feild
+7.599337 seconds.
+7.749559 seconds.
+7.471908 seconds.
+8.005726 seconds.
+8.135477 seconds.
+7.440862 seconds.
+7.720851 seconds.
+8.381324 seconds.
+8.524794 seconds.
+8.191195 seconds.
+arverge
+7.9221033

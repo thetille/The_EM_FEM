@@ -18,12 +18,12 @@ import scipy.io as io
 
 gmsh.initialize(sys.argv)
 
-name_list = ["cylinder_waveguide{}","waveguide_model2{}"]
-name = name_list[1]
+name_list = ["cylinder_waveguide{}","waveguide_model2{}","waveguide_model3{}"]
+name = name_list[2]
 gmsh.open(name.format(".geo"))
 
 def meshSizeCallback(dim, tag, x, y, z):
-    return 0.08 - 0.15*z
+    return 0.08 #- 0.15*z
 
 gmsh.model.mesh.setSizeCallback(meshSizeCallback)
 
@@ -131,7 +131,7 @@ fac2no_port1 = gmsh.model.mesh.getElements(dim = groups[groupidx][0], tag = ente
 fac2no_port1 = np.reshape(fac2no_port1[2],(-1,3))
 
 groupidx = groups_name.index('port2')
-fac2no_port2 = gmsh.model.mesh.getElements(dim = groups[1][0], tag = enteisesForGroupe[1][0])
+fac2no_port2 = gmsh.model.mesh.getElements(dim = groups[1][0], tag = enteisesForGroupe[groupidx][0])
 fac2no_port2 = np.reshape(fac2no_port2[2],(-1,3))
 
 groupidx = groups_name.index('bound')
@@ -217,7 +217,7 @@ ed2no_bound = ed2no_bound.astype('float64')
 fa2no_all = fa2no_all.astype('float64')
 ed2no_pec = ed2no_pec.astype('float64')
 
-mdic = {"no2xyz": no2xyz.T, "el2no": el2no.T, "el2ma": el2ma, "ed2no_all": ed2no_all.T, "ed2no_port1": ed2no_port1.T, "ed2no_port2": ed2no_port2.T, "ed2no_bound": ed2no_bound.T, "fa2no_all": fa2no_all.T, "ed2no_pec": ed2no_pec.T}
+mdic = {"no2xyz": no2xyz.T, "el2no": el2no.T, "el2ma": el2ma, "ed2no_all": ed2no_all.T, "ed2no_port1": ed2no_port1.T, "ed2no_port2": ed2no_port2.T, "ed2no_bound": ed2no_bound.T, "fa2no_all": fa2no_all.T, "ed2no_pec": ed2no_pec.T, "fac2no_port1": fac2no_port1.T, "fac2no_port2": fac2no_port2.T}
 io.savemat(name.format(".mat"), mdic)
 
 # fig = plt.figure()
