@@ -16,7 +16,7 @@ e0 = 1/(m0*c0^2);   % permittivity in vacuum
 z0 = sqrt(m0/e0);   % wave 	 in vacuum
 
 % Read mesh
-file_list = ["cylinder_waveguide2", "waveguide_model2","mesh_cylinder_R0"];
+file_list = ["cylinder_waveguide2", "waveguide_model3","mesh_cylinder_R0"];
 load(file_list(2))
 
 % ed2no_pec = [ed2no_port1, ed2no_port2, ed2no_bound];
@@ -39,8 +39,8 @@ edIdx_int = setdiff(edIdx_all, edIdx_pec); % removes all edges that are pec from
 noIdx_int = setdiff(noIdx_all, noIdx_pec); % removes all nodes that are pec from the index
 tic
 % Assemble global matrices
-[AMtx,BMtx] = ...
-    Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2si, ed2no_port1, ed2no_port2);
+[KMtx] = ...
+    Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2si, fac2no_port1, fac2no_port2);
 
 % no2xyz = coordinates to all points
 % el2no = all points in a tetra

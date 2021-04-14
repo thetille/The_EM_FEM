@@ -4,6 +4,7 @@ clear all
 % problems, respectively [solver = 'direct' or 'sparse']
 solver = ['direct';'sparse'];
 solver = solver(2,:);
+eigNumber = 60;
 
 % Materials
 ma2er = {@(x,y,z) 1};% + 4*exp(-((x-0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
@@ -37,7 +38,7 @@ noIdx_all = 1:size(no2xyz,2); % each node gets an id
 % Compute the interior edges
 edIdx_int = setdiff(edIdx_all, edIdx_pec); % removes all edges that are pec from the index
 noIdx_int = setdiff(noIdx_all, noIdx_pec); % removes all nodes that are pec from the index
-tic
+
 % Assemble global matrices
 [AMtx,BMtx] = ...
     Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2si);
@@ -75,8 +76,8 @@ if strcmp(solver, 'direct') % direct method
     % eigVal are the eigenvalues
 elseif strcmp(solver, 'sparse') % sparse method
     freq = 1.45; %find the igenvalues close to (in GHZ)
-    
-    [eigVtr_int, eigVal] = eigs(aMtx, 0.5*(bMtx+bMtx'), 30, ((freq*2*pi*1e9)/c0)^2);
+    tic
+    [eigVtr_int, eigVal] = eigs(aMtx, 0.5*(bMtx+bMtx'), eigNumber , ((freq*2*pi*1e9)/c0)^2);
     toc
 else
     error('unknown eigenvalue solver')
@@ -94,7 +95,7 @@ fr = c0*sqrt(eigVal)/(2*pi); % eigenfrequency
 
 % Select the modes that will be visualized
 if solver == 'sparse'
-    mVtr = 1:30;
+    mVtr = 1:eigNumber;
 else
   mVtr = length(noIdx_int)+1:length(noIdx_int)+1+30;%length(fr)%length(no2xyz):length(fr);
 end
@@ -113,11 +114,12 @@ plot(real(fr(mVtr))/1e9,'X','DisplayName','Implementation')
 %subplot(2,1,2)
 hold on
 load("cst_data")
-plot(cst_data,'X','DisplayName','CST')
+plot(cst_data,'+','DisplayName','CST')
 xlabel('Modes []')
 ylabel('Frequency [GHz]')
 legend
 grid on
+title("E field only")
 
 % Visualize the eigenmodes
 %solIdx_bFld = 1:faNum_dof; % The solution for the magnetic field  
@@ -183,18 +185,24 @@ for mIdx = mVtr
     %phase_list = [1:-0.1:-1];
     %i = 1;
     %for phase = [phase_list flip(phase_list(1:end-1)) ]
-        figure(4), clf;
-        %V = (phase*exViz).^2+(phase*eyViz).^2+(phase*ezViz).^2;
-        V = (exViz).^2+(eyViz).^2+(ezViz).^2;
-    
-        res = [0.005,0.005,0.005];
-        [Xq,Yq,Zq] = meshgrid(-0.1:res(1):0.1, -.1:res(2):.1 ,0:res(3):0.4);
-        Vq = griddata(X,Y,Z,V,Xq,Yq,Zq);
+    figure(4), clf;
+    %V = (phase*exViz).^2+(phase*eyViz).^2+(phase*ezViz).^2;
+    V = (exViz).^2+(eyViz).^2+(ezViz).^2;
 
-        slice(Xq,Yq,Zq,Vq,0,0,[0.1 0.3]);
-        shading flat
-        title(sprintf('eigenfrequency [GHz]: %2.2f + %2.2fi',real(fr(mIdx))/1e9,imag(fr(mIdx))/1e9 ))
-        %F(i) = getframe();
+    res = [0.005,0.005,0.005];
+    [Xq,Yq,Zq] = meshgrid(-0.1:res(1):0.1, -.1:res(2):.1 ,0:res(3):0.4);
+    Vq = griddata(X,Y,Z,V,Xq,Yq,Zq);
+
+    slice(Xq,Yq,Zq,Vq,0,0,[0.1 0.3]);
+    shading flat
+    title(sprintf('eigenfrequency [GHz]: %2.2f + %2.2fi',real(fr(mIdx))/1e9,imag(fr(mIdx))/1e9 ))
+    
+    figure(5), clf;
+    slice(Xq,Yq,Zq,Vq,[-0.1 0.1],[-0.1 0.1],[0 0.4]);
+    shading flat
+    title(sprintf('eigenfrequency [GHz]: %2.2f + %2.2fi',real(fr(mIdx))/1e9,imag(fr(mIdx))/1e9 ))
+    pbaspect([1 1 1])
+    %F(i) = getframe();
         %i = i+1;
     %end
     %figure(5)

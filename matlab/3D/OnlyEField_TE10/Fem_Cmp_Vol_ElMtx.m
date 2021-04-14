@@ -3,7 +3,7 @@
 % numerical integration on the reference element
 % --------------------------------------------------------------
 function [KElMtx_EE] = ...
-    Fem_CmpElMtx(xyz, ma2er, ma2si, k0)
+    Fem_Cmp_Vol_ElMtx(xyz, ma2er, ma2si, k0)
 
 % Argument:
 %   xyz = the coordinates of the nodes of the element
@@ -44,20 +44,6 @@ ug{1} = [-1 -1 -1]';
 ug{2} = [+1 0 0]';
 ug{3} = [0 +1 0]';
 ug{4} = [0 0 +1]';
-
-% % H(div) basis functions
-% uim{1} = 2*(  cross(ug{2},ug{1})*up{3} ...
-%             + cross(ug{1},ug{3})*up{2} ...
-%             + cross(ug{3},ug{2})*up{1});
-% uim{2} = 2*(  cross(ug{2},ug{4})*up{1} ...
-%             + cross(ug{4},ug{1})*up{2} ...
-%             + cross(ug{1},ug{2})*up{4});
-% uim{3} = 2*(  cross(ug{3},ug{4})*up{2} ...
-%             + cross(ug{4},ug{2})*up{3} ...
-%             + cross(ug{2},ug{3})*up{4});
-% uim{4} = 2*(  cross(ug{1},ug{4})*up{3} ...
-%             + cross(ug{4},ug{3})*up{1} ...
-%             + cross(ug{3},ug{1})*up{4});
     
 % H(curl) basis function
 uin{1} = ug{2}*up{1} - ug{1}*up{2};
@@ -101,8 +87,6 @@ for iIdx = 1:6
     gcn{iIdx} = map_dcs*ucn{iIdx};
 end
 
-
-
 % Evaluation of element matrix: curl_Ni curl_Nj
 % K_{ij}
 for iIdx = 1:6
@@ -110,7 +94,7 @@ for iIdx = 1:6
         maTmp = ones(size(q2w));
         ipTmp = maTmp.*sum(gcn{iIdx}.*gcn{jIdx});
         er = ma2er(q2x(1,:),q2x(2,:),q2x(3,:));
-        endTemp = k0^2*er. * sum(gin{iIdx}. * gin{jIdx});
+        endTemp = k0^2*er.* sum(gin{iIdx}.* gin{jIdx});
         KElMtx_EE(iIdx,jIdx) = (ipTmp - endTemp) * q2w' * det_jac;
     end
 end
