@@ -20,8 +20,8 @@ f = 2*10^9; % 2 ghz
 k0 = (f/c0)^2 * 4*pi^2;
 
 % only needed for small b
-k_z10 = sqrt(k0^2-(pi/a)^2);
-Einc = e10*
+k_z10 = sqrt(k0^2-(pi/a)^2); 
+%Einc = e10*
 %gamma = 1j*k_z10;
 
 
@@ -62,16 +62,6 @@ usnn{2} = [-up{2}*ug{3}(1)+up{2}*ug{3}(1); -up{2}*ug{3}(2)+up{2}*ug{3}(2); 0,0,0
 usnn{3} = [-up{3}*ug{1}(1)+up{1}*ug{3}(1); -up{3}*ug{1}(2)+up{1}*ug{3}(2); 0,0,0];
 
 
-% % Curl of H(curl) basis functions
-% ouTmp = ones(size(q2w));
-% ucn{1} = 2*cross(ug{1},ug{2})*ouTmp;
-% ucn{2} = 2*cross(ug{2},ug{3})*ouTmp;
-% ucn{3} = 2*cross(ug{3},ug{1})*ouTmp;
-
-
-% usn{1} = cross(repmat([0,0,1]',1,3),uin{1}(:,1));
-% usn{2} = cross([0,0,1],uin{2});
-% usn{3} = cross([0,0,1],uin{3});
 
 % Physical coordinates
 % Maps from refference element to physical element
@@ -93,6 +83,25 @@ end
 det_jac = det(jac);
 map_ccs = inv(jac);      % mapping for curl-conforming space
 %map_dcs = jac'/det_jac;  % mapping for div-conforming space
+
+
+
+% Jacobian for U_inc
+jacU = zeros(3);
+for iIdx = 1:3
+    jac = jac ...
+        + [xyz(1,iIdx)*ug{iIdx}', 0; ...
+           xyz(2,iIdx)*ug{iIdx}', 0; ...
+           xyz(3,iIdx)*ug{iIdx}', 1]';
+end
+
+% Mappings
+det_jac = det(jac);
+map_ccs = inv(jac);
+
+
+
+
 for iIdx = 1:3
     gin{iIdx} = map_ccs*uin{iIdx};
     gsn{iIdx} = map_ccs*usn{iIdx};
@@ -108,10 +117,11 @@ for iIdx = 1:3
     end
 end
 
-b_{ij} ElMtx n x < [j^{-1}]N
+%b_{ij} ElMtx n x n x [j^{-1}]N
+e10xy = sin()
 for iIdx = 1:3
-    %maTmp = ones(size(q2w));
     ipTmp = sum(gsnn{iIdx});
-    BElMtx_EE(iIdx,jIdx) = gamma * ipTmp * q2w' * det_jac;
+    
+    bElMtx_EE(iIdx,jIdx) = gamma * ipTmp * q2w' * det_jac;
 end
 
