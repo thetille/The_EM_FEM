@@ -2,7 +2,7 @@
 % Compute element matrices for the port surfaces (trangles) by means of
 % numerical integration on the reference element
 % --------------------------------------------------------------
-function [BElMtx_EE] = ...
+function [bElMtx_EE] = ...
     Fem_Cmp_Surface_ElMtx(xyz) % need to change from hardcode to adaptive
 % Argument:
 %   xyz = the coordinates of the nodes of the element
@@ -12,6 +12,18 @@ function [BElMtx_EE] = ...
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% need  to incorperate to be more flexible
+a = 0.2;
+c0 = 299792458;
+f = 2*10^9; % 2 ghz
+k0 = (f/c0)^2 * 4*pi^2;
+
+% only needed for small b
+k_z10 = sqrt(k0^2-(pi/a)^2); 
+%Einc = e10*
+%gamma = 1j*k_z10;
+
 
 % Quadrature rule
 q2u = [[6.666666666666667e-01, ...
@@ -49,6 +61,8 @@ usnn{1} = [-up{2}*ug{1}(1)+up{1}*ug{2}(1); -up{2}*ug{1}(2)+up{1}*ug{2}(2); 0,0,0
 usnn{2} = [-up{2}*ug{3}(1)+up{2}*ug{3}(1); -up{2}*ug{3}(2)+up{2}*ug{3}(2); 0,0,0];
 usnn{3} = [-up{3}*ug{1}(1)+up{1}*ug{3}(1); -up{3}*ug{1}(2)+up{1}*ug{3}(2); 0,0,0];
 
+
+
 % Physical coordinates
 % Maps from refference element to physical element
 q2x = zeros(3,length(q2w)); % allocate memorry
@@ -70,6 +84,8 @@ det_jac = det(jac);
 map_ccs = inv(jac);      % mapping for curl-conforming space
 %map_dcs = jac'/det_jac;  % mapping for div-conforming space
 
+
+
 % Jacobian for U_inc
 jacU = zeros(3);
 for iIdx = 1:3
@@ -84,23 +100,33 @@ det_jac = det(jac);
 map_ccs = inv(jac);
 
 
+
+
 for iIdx = 1:3
+    gin{iIdx} = map_ccs*uin{iIdx};
     gsn{iIdx} = map_ccs*usn{iIdx};
+    gsnn{iIdx} = map_ccs*usnn{iIdx};
 end
 
+% % B_{ij} ElMtx [j^{-1}] n x < N
+% for iIdx = 1:3
+%     for jIdx = 1:3
+%         %maTmp = ones(size(q2w));
+%         ipTmp = sum(gsn{iIdx}.* gsn{jIdx});
+%         BElMtx_EE(iIdx,jIdx) = gamma * ipTmp * q2w' * det_jac;
+%     end
+% end
+
+%b_{ij} ElMtx n x n x [j^{-1}]N
+%e10xy = sin()
 a = 0.2;
 c0 = 299792458;
 f = 2*10^9; % 2 ghz
 k0 = (f/c0)^2 * 4*pi^2;
 k_z10 = sqrt(k0^2-(pi/a)^2);
 gamma = 1j*k_z10;
-% B_{ij} ElMtx [j^{-1}] n x < N
 for iIdx = 1:3
-    for jIdx = 1:3
-        %maTmp = ones(size(q2w));
-        ipTmp = sum(gsn{iIdx}.* gsn{jIdx});
-        BElMtx_EE(iIdx,jIdx) = gamma * ipTmp * q2w' * det_jac;
-    end
+    ipTmp = sum(gsnn{iIdx});
+    bElMtx_EE(iIdx) = gamma * ipTmp * q2w' * det_jac * 10*xyz(1,iIdx);
 end
-
 
