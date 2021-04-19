@@ -96,7 +96,7 @@ for no = [fac2no_port1, fac2no_port2] % goes throug the amount of thetras
     %no = el2no(:,elIdx); % current nodes (corners / points)
     xyz = no2xyz(:,no); % coordinates for the nodes (4 nodes)
     
-    [KElMtx_EE] = ...
+    [bElMtx_EE,BElMtx_EE] = ...
         Fem_Cmp_Surface_ElMtx(xyz,gamma);
     %for edges
     noTmp = zeros(2,3); %zeros(size(ed2noLoc)); % temp var of size of the amount of initial base lines (edges) 
@@ -112,7 +112,8 @@ for no = [fac2no_port1, fac2no_port2] % goes throug the amount of thetras
     
     irRes_EE(idxRes_EE + (1:incRes_EE) - 1) = irTmp_EE(:); % includes all row indexes for all thetras for eMtx and sMtx
     icRes_EE(idxRes_EE + (1:incRes_EE) - 1) = icTmp_EE(:); % includes all column indexis for all thetras for eMtx and sMtx
-    meRes_EE(idxRes_EE + (1:incRes_EE) - 1) = isTmp_EE(:).*KElMtx_EE(:); % resulting data for eMtx
+    mBRes_EE(idxRes_EE + (1:incRes_EE) - 1) = isTmp_EE(:).*BElMtx_EE(:); % resulting data for eMtx
+    mbRes_EE(idxRes_EE + (1:incRes_EE) - 1) = isTmp_EE(:).*bElMtx_EE(:); % resulting data for eMtx
 
     
     idxRes_EE = idxRes_EE + incRes_EE; % incerment pointer for edge edge

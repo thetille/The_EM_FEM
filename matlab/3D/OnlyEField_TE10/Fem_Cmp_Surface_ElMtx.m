@@ -118,7 +118,7 @@ for iIdx = 1:3
 end
 
 %b_{ij} ElMtx n x n x [j^{-1}]N
-e10xy = sin()
+%e10xy = sin()
 for iIdx = 1:3
     ipTmp = sum(gsnn{iIdx});
     
