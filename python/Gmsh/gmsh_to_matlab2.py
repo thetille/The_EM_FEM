@@ -18,12 +18,12 @@ import scipy.io as io
 
 gmsh.initialize(sys.argv)
 
-name_list = ["cylinder_waveguide{}","waveguide_model2{}","waveguide_model3{}"]
-name = name_list[2]
+name_list = ["cylinder_waveguide{}","waveguide_model2{}","waveguide_model3{}","waveguide_model3 - simple{}"]
+name = name_list[3]
 gmsh.open(name.format(".geo"))
 
 def meshSizeCallback(dim, tag, x, y, z):
-    return 0.08 #- 0.15*z
+    return 1 #- 0.15*z
 
 gmsh.model.mesh.setSizeCallback(meshSizeCallback)
 
@@ -175,6 +175,7 @@ ax = a3.Axes3D(plt.figure())
 ax.set_xlim(np.min(no2xyz[:,0]),np.max(no2xyz[:,0]))
 ax.set_ylim(np.min(no2xyz[:,1]),np.max(no2xyz[:,1]))
 ax.set_zlim(np.min(no2xyz[:,2]),np.max(no2xyz[:,2]))
+
 
 for i in range(len(ed2no_port1)):
     nodes = ed2no_port1[i,:]
