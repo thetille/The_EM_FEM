@@ -1,5 +1,7 @@
 clc
 clear
+figure(2)
+figure(1)
 clf(1)
 clf(2)
 %close all
@@ -8,12 +10,26 @@ clf(2)
 Ph_triangle = [0.5, 0.1; 0.5, 0.5; 0.1, 0.5];
 Ref_triangle = [0, 0; 1, 0; 0, 1];
 
+xyz = [Ph_triangle'; 0,0,0];
+
+ug{1} = [-1 -1]';
+ug{2} = [+1 0]';
+ug{3} = [0 +1]';
+
+
+jac = zeros(3);
+for iIdx = 1:3
+    jac = jac ...
+        + [xyz(1,iIdx)*ug{iIdx}', 0; ...
+           xyz(2,iIdx)*ug{iIdx}', 0; ...
+           xyz(3,iIdx)*ug{iIdx}', 1]';
+end
 
 
 for i = 1:3
     x = Ph_triangle(1,1) + (Ph_triangle(2,1)-Ph_triangle(1,1))*Ref_triangle(i,1)+(Ph_triangle(3,1)-Ph_triangle(1,1))*Ref_triangle(i,2);
     y = Ph_triangle(1,2) + (Ph_triangle(2,2)-Ph_triangle(1,2))*Ref_triangle(i,1)+(Ph_triangle(3,2)-Ph_triangle(1,2))*Ref_triangle(i,2);
-    sol_triangle(i,:) =  [x,y]
+    sol_triangle(i,:) =  [x,y];
 end
 
 %grid

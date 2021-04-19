@@ -103,4 +103,14 @@ for iIdx = 1:3
     end
 end
 
+<<<<<<< HEAD
+=======
+%b_{ij} ElMtx n x n x [j^{-1}]N
+%e10xy = sin()
+for iIdx = 1:3
+    ipTmp = sum(gsnn{iIdx});
+    
+    bElMtx_EE(iIdx,jIdx) = gamma * ipTmp * q2w' * det_jac;
+end
+>>>>>>> d3d52b0280272b8020fca28c7a02138e6ec43696
 

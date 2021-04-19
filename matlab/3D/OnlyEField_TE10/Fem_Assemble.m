@@ -107,7 +107,6 @@ for no = [fac2no_port1, fac2no_port2] % goes throug the amount of thetras
     irRes_EE(idxRes_EE + (1:incRes_EE) - 1) = irTmp_EE(:); % includes all row indexes for all thetras for eMtx and sMtx
     icRes_EE(idxRes_EE + (1:incRes_EE) - 1) = icTmp_EE(:); % includes all column indexis for all thetras for eMtx and sMtx
     mBRes_EE(idxRes_EE + (1:incRes_EE) - 1) = isTmp_EE(:).*BElMtx_EE(:); % resulting data for eMtx
-
     
     idxRes_EE = idxRes_EE + incRes_EE; % incerment pointer for edge edge
 
