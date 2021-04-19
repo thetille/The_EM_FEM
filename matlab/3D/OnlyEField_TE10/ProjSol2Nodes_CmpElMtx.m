@@ -39,10 +39,6 @@ q2r_lump = [[0.000000000000000e+00, 0.000000000000000e+00, 0.000000000000000e+00
     [1.000000000000000e+00, 0.000000000000000e+00, 0.000000000000000e+00]; ...
     [0.000000000000000e+00, 1.000000000000000e+00, 0.000000000000000e+00]; ...
     [0.000000000000000e+00, 0.000000000000000e+00, 1.000000000000000e+00]]';
-q2w_lump = [4.166666666666666e-02; ...
-    4.166666666666666e-02; ...
-    4.166666666666666e-02; ...
-    4.166666666666666e-02]';
 
 % H(grad) basis functions
 up{1} = 1 - q2r(1,:) - q2r(2,:) - q2r(3,:);
@@ -62,10 +58,10 @@ ug{3} = [0 +1 0]';
 ug{4} = [0 0 +1]';
 
 % H(div) basis functions
-uim{1} = 2*(cross(ug{2},ug{1})*up{3} + cross(ug{1},ug{3})*up{2} + cross(ug{3},ug{2})*up{1});
-uim{2} = 2*(cross(ug{2},ug{4})*up{1} + cross(ug{4},ug{1})*up{2} + cross(ug{1},ug{2})*up{4});
-uim{3} = 2*(cross(ug{3},ug{4})*up{2} + cross(ug{4},ug{2})*up{3} + cross(ug{2},ug{3})*up{4});
-uim{4} = 2*(cross(ug{1},ug{4})*up{3} + cross(ug{4},ug{3})*up{1} + cross(ug{3},ug{1})*up{4});
+% uim{1} = 2*(cross(ug{2},ug{1})*up{3} + cross(ug{1},ug{3})*up{2} + cross(ug{3},ug{2})*up{1});
+% uim{2} = 2*(cross(ug{2},ug{4})*up{1} + cross(ug{4},ug{1})*up{2} + cross(ug{1},ug{2})*up{4});
+% uim{3} = 2*(cross(ug{3},ug{4})*up{2} + cross(ug{4},ug{2})*up{3} + cross(ug{2},ug{3})*up{4});
+% uim{4} = 2*(cross(ug{1},ug{4})*up{3} + cross(ug{4},ug{3})*up{1} + cross(ug{3},ug{1})*up{4});
 
 % H(curl) basis function
 uin{1} = ug{2}*up{1} - ug{1}*up{2};
@@ -76,13 +72,13 @@ uin{5} = ug{4}*up{2} - ug{2}*up{4};
 uin{6} = ug{4}*up{3} - ug{3}*up{4};
 
 % Curl of H(curl) basis functions
-ouTmp = ones(size(q2w));
-ucn{1} = 2*cross(ug{1},ug{2})*ouTmp;
-ucn{2} = 2*cross(ug{2},ug{3})*ouTmp;
-ucn{3} = 2*cross(ug{3},ug{1})*ouTmp;
-ucn{4} = 2*cross(ug{1},ug{4})*ouTmp;
-ucn{5} = 2*cross(ug{2},ug{4})*ouTmp;
-ucn{6} = 2*cross(ug{3},ug{4})*ouTmp;
+% ouTmp = ones(size(q2w));
+% ucn{1} = 2*cross(ug{1},ug{2})*ouTmp;
+% ucn{2} = 2*cross(ug{2},ug{3})*ouTmp;
+% ucn{3} = 2*cross(ug{3},ug{1})*ouTmp;
+% ucn{4} = 2*cross(ug{1},ug{4})*ouTmp;
+% ucn{5} = 2*cross(ug{2},ug{4})*ouTmp;
+% ucn{6} = 2*cross(ug{3},ug{4})*ouTmp;
 
 % Jacobian
 jac = zeros(3);
@@ -96,13 +92,13 @@ end
 % Mappings
 det_jac = det(jac);
 map_ccs = inv(jac);      % mapping for curl-conforming space
-map_dcs = jac'/det_jac;  % mapping for div-conforming space
+%map_dcs = jac'/det_jac;  % mapping for div-conforming space
 for iIdx = 1:6
     gin{iIdx} = map_ccs*uin{iIdx};
-    gcn{iIdx} = map_dcs*ucn{iIdx};
+    %gcn{iIdx} = map_dcs*ucn{iIdx};
 end
 for iIdx = 1:4
-    gim{iIdx} = map_dcs*uim{iIdx};
+    %gim{iIdx} = map_dcs*uim{iIdx};
 end
 
 % Evaluation of element matrix: phi_i phi_j
@@ -128,21 +124,5 @@ for iIdx = 1:4
         iElMtx_NE.x(iIdx,jIdx) = (bsiTmp.*bxjTmp) * q2w' * det_jac;
         iElMtx_NE.y(iIdx,jIdx) = (bsiTmp.*byjTmp) * q2w' * det_jac;
         iElMtx_NE.z(iIdx,jIdx) = (bsiTmp.*bzjTmp) * q2w' * det_jac;
-    end
-end
-
-% Evaluation of element matrix: phi_i (x * Mj)
-iElMtx_NF.x = zeros(4,4);
-iElMtx_NF.y = zeros(4,4);
-iElMtx_NF.z = zeros(4,4);
-for iIdx = 1:4
-    for jIdx = 1:4
-        bsiTmp = up{iIdx};
-        bxjTmp = gim{jIdx}(1,:);
-        byjTmp = gim{jIdx}(2,:);
-        bzjTmp = gim{jIdx}(3,:);
-        iElMtx_NF.x(iIdx,jIdx) = (bsiTmp.*bxjTmp) * q2w' * det_jac;
-        iElMtx_NF.y(iIdx,jIdx) = (bsiTmp.*byjTmp) * q2w' * det_jac;
-        iElMtx_NF.z(iIdx,jIdx) = (bsiTmp.*bzjTmp) * q2w' * det_jac;
     end
 end
