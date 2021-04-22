@@ -42,12 +42,8 @@ uin{3} = [ug{1}*up{3} - ug{3}*up{1}; 0,0,0];
 
 %S, n x N
 usn{1} = [-up{1}*ug{2}(2)+up{2}*ug{1}(2); up{1}*ug{2}(1)-up{2}*ug{1}(1); 0,0,0];
-usn{2} = [-up{2}*ug{3}(2)+up{2}*ug{3}(2); up{2}*ug{3}(1)-up{2}*ug{3}(1); 0,0,0];
+usn{2} = [-up{2}*ug{3}(2)+up{3}*ug{2}(2); up{2}*ug{3}(1)-up{3}*ug{2}(1); 0,0,0];
 usn{3} = [-up{3}*ug{1}(2)+up{1}*ug{3}(2); up{3}*ug{1}(1)-up{1}*ug{3}(1); 0,0,0];
-
-usnn{1} = [-up{2}*ug{1}(1)+up{1}*ug{2}(1); -up{2}*ug{1}(2)+up{1}*ug{2}(2); 0,0,0];
-usnn{2} = [-up{2}*ug{3}(1)+up{2}*ug{3}(1); -up{2}*ug{3}(2)+up{2}*ug{3}(2); 0,0,0];
-usnn{3} = [-up{3}*ug{1}(1)+up{1}*ug{3}(1); -up{3}*ug{1}(2)+up{1}*ug{3}(2); 0,0,0];
 
 % Physical coordinates
 % Maps from refference element to physical element
@@ -70,27 +66,13 @@ det_jac = det(jac);
 map_ccs = inv(jac);      % mapping for curl-conforming space
 %map_dcs = jac'/det_jac;  % mapping for div-conforming space
 
-% Jacobian for U_inc
-jacU = zeros(3);
-for iIdx = 1:3
-    jac = jac ...
-        + [xyz(1,iIdx)*ug{iIdx}', 0; ...
-           xyz(2,iIdx)*ug{iIdx}', 0; ...
-           xyz(3,iIdx)*ug{iIdx}', 1]';
-end
-
-% Mappings
-det_jac = det(jac);
-map_ccs = inv(jac);
-
-
 for iIdx = 1:3
     gsn{iIdx} = map_ccs*usn{iIdx};
 end
 
 a = 0.2;
 c0 = 299792458;
-f = 2*10^9; % 2 ghz
+f = 0.7495*10^9; % 2 ghz
 k0 = (f/c0)^2 * 4*pi^2;
 k_z10 = sqrt(k0^2-(pi/a)^2);
 gamma = 1j*k_z10;
@@ -102,15 +84,4 @@ for iIdx = 1:3
         BElMtx_EE(iIdx,jIdx) = gamma * ipTmp * q2w' * det_jac;
     end
 end
-
-<<<<<<< HEAD
-=======
-%b_{ij} ElMtx n x n x [j^{-1}]N
-%e10xy = sin()
-for iIdx = 1:3
-    ipTmp = sum(gsnn{iIdx});
-    
-    bElMtx_EE(iIdx,jIdx) = gamma * ipTmp * q2w' * det_jac;
-end
->>>>>>> d3d52b0280272b8020fca28c7a02138e6ec43696
 

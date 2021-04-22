@@ -155,5 +155,5 @@ for no = fac2no_port1 % goes throug the amount of thetras
 
 end
 
-bMtx = zeros(4566,1);%sparse(irRes_EE, ones(354,1), mbRes_EE, edNumGlo, edNumGlo);
+bMtx = zeros(size(KMtx,1),1);%sparse(irRes_EE, ones(354,1), mbRes_EE, edNumGlo, edNumGlo);
 bMtx(irRes_EE) = mbRes_EE;
