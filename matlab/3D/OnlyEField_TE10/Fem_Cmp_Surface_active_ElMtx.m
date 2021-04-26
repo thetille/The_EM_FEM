@@ -3,7 +3,7 @@
 % numerical integration on the reference element
 % --------------------------------------------------------------
 function [bElMtx_EE] = ...
-    Fem_Cmp_Surface_ElMtx(xyz) % need to change from hardcode to adaptive
+    Fem_Cmp_Surface_ElMtx(xyz,k_z10,a) % need to change from hardcode to adaptive
 % Argument:
 %   xyz = the coordinates of the nodes of the element
 %   ma2er = material to permittivity
@@ -12,18 +12,7 @@ function [bElMtx_EE] = ...
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% need  to incorperate to be more flexible
-a = 0.2;
-c0 = 299792458;
-f = 2*10^9; % 2 ghz
-k0 = (f/c0)^2 * 4*pi^2;
-
-% only needed for small b
-k_z10 = sqrt(k0^2-(pi/a)^2); 
-%Einc = e10*
-%gamma = 1j*k_z10;
-
+normals = 0;
 
 % Quadrature rule
 q2u = [[6.666666666666667e-01, ...
@@ -52,19 +41,28 @@ uin{1} = [ug{2}*up{1} - ug{1}*up{2}; 0,0,0];
 uin{2} = [ug{3}*up{2} - ug{2}*up{3}; 0,0,0];
 uin{3} = [ug{1}*up{3} - ug{3}*up{1}; 0,0,0];
 
-uinc{1} = [1,0,0;0,0,0,;0,0,0];
-uinc{2} = [0,0,0;0,0,0,;0,0,0];
-uinc{3} = [0,0,0;0,0,0,;0,0,0];
-
+direction = -1;
+n = repmat([0,0,1],3,1)'*direction;
+if normals
+    figure(3);
+    scale = 0.05;
+    quiver3(xyz(1,:),xyz(2,:),xyz(3,:),n(1,:)*scale,n(2,:)*scale,n(3,:)*scale,'Autoscale', 'off')
+end
 %S, n x N
-usn{1} = [-up{1}*ug{2}(2)+up{2}*ug{1}(2); up{1}*ug{2}(1)-up{2}*ug{1}(1); 0,0,0];
-usn{2} = [-up{2}*ug{3}(2)+up{3}*ug{2}(2); up{2}*ug{3}(1)-up{3}*ug{2}(1); 0,0,0];
-usn{3} = [-up{3}*ug{1}(2)+up{1}*ug{3}(2); up{3}*ug{1}(1)-up{1}*ug{3}(1); 0,0,0];
+usn{1} = cross(n,uin{1});
+usn{2} = cross(n,uin{2});
+usn{3} = cross(n,uin{3});
+% usn{1} = [-up{1}*ug{2}(2)+up{2}*ug{1}(2); up{1}*ug{2}(1)-up{2}*ug{1}(1); 0,0,0];
+% usn{2} = [-up{2}*ug{3}(2)+up{3}*ug{2}(2); up{2}*ug{3}(1)-up{3}*ug{2}(1); 0,0,0];
+% usn{3} = [-up{3}*ug{1}(2)+up{1}*ug{3}(2); up{3}*ug{1}(1)-up{1}*ug{3}(1); 0,0,0];
 
 %n x S (n x (n x S)) 
-usnn{1} = [-up{1}*ug{2}(1)+up{2}*ug{1}(1); -up{1}*ug{2}(2)+up{2}*ug{1}(2); 0,0,0];
-usnn{2} = [-up{2}*ug{3}(1)+up{3}*ug{2}(1); -up{2}*ug{3}(2)+up{3}*ug{2}(2); 0,0,0];
-usnn{3} = [-up{3}*ug{1}(1)+up{1}*ug{3}(1); -up{3}*ug{1}(2)+up{1}*ug{3}(2); 0,0,0];
+usnn{1} = cross(n,usn{1});
+usnn{2} = cross(n,usn{2});
+usnn{3} = cross(n,usn{3});
+% usnn{1} = [-up{1}*ug{2}(1)+up{2}*ug{1}(1); -up{1}*ug{2}(2)+up{2}*ug{1}(2); 0,0,0];
+% usnn{2} = [-up{2}*ug{3}(1)+up{3}*ug{2}(1); -up{2}*ug{3}(2)+up{3}*ug{2}(2); 0,0,0];
+% usnn{3} = [-up{3}*ug{1}(1)+up{1}*ug{3}(1); -up{3}*ug{1}(2)+up{1}*ug{3}(2); 0,0,0];
 
 
 
@@ -89,43 +87,32 @@ det_jac = det(jac);
 map_ccs = inv(jac);       % mapping for curl-conforming space
 %map_dcs = jac'/det_jac;  % mapping for div-conforming space
 
-%Jacobian for U_inc
-jacU = zeros(3);
-jacU = [xyz(1,3)-xyz(1,3), xyz(1,2)-xyz(1,1); ...
-        xyz(2,3)-xyz(2,1), xyz(2,2)-xyz(2,1)];
-
-% Mappings
-det_jacU = det(jacU);
 
 
 for iIdx = 1:3
-    gin{iIdx} = map_ccs*uin{iIdx};
-    gsn{iIdx} = map_ccs*usn{iIdx};
     gsnn{iIdx} = map_ccs*usnn{iIdx};
-    guinc{iIdx} = map_ccs*uinc{iIdx};
 end
 
-%b_{ij} ElMtx n x n x [j^{-1}]N
-a = 0.2;
-c0 = 299792458;
-f = 0.7495*10^9; % 2 ghz
-k0 = (f/c0)^2 * 4*pi^2;
-k_z10 = sqrt(k0^2-(pi/a)^2);
-gamma = 1j*k_z10;
 
-xyz = xyz+(a/2); % (the waveguide needs to start at 0 to a
-q2uTx = xyz(1,1)+(xyz(1,2)-xyz(1,1))*q2u(1,:)+(xyz(1,3)-xyz(1,1))*q2u(2,:);
-q2uTy = xyz(2,1)+(xyz(2,2)-xyz(2,1))*q2u(1,:)+(xyz(2,3)-xyz(2,1))*q2u(2,:);
+%b_{ij} ElMtx n x n x [j^{-1}]N * U_inc
+% %Jacobian for U_inc
+% jacU = zeros(3);
+% jacU = [xyz(1,3)-xyz(1,3), xyz(1,2)-xyz(1,1); ...
+%         xyz(2,3)-xyz(2,1), xyz(2,2)-xyz(2,1)];
+% % Mappings
+% det_jacU = det(jacU);
 
-Area = 1/2*abs(xyz(1,1)*(xyz(2,2)-xyz(2,3))+ xyz(1,2)*(xyz(2,3)-xyz(2,1)) + xyz(1,3)*(xyz(2,1)-xyz(2,2)));
+figure(10), hold on
+scatter(xyz(1,:),xyz(2,:),'g');
+scatter(q2x(1,:),q2x(2,:),'r','x');
 
+%xyz = xyz+(a/2); % (the waveguide needs to start at 0 to a
+%Area = 1/2*abs(xyz(1,1)*(xyz(2,2)-xyz(2,3))+ xyz(1,2)*(xyz(2,3)-xyz(2,1)) + xyz(1,3)*(xyz(2,1)-xyz(2,2)));
 
-Uinc = -2j*k_z10*10*[0,0,0;sin((pi*q2uTx)/a);0,0,0]*Area;
-figure(10),hold on
-scatter(xyz(1,:),xyz(2,:));
+Uinc = -2j*k_z10*[0,0,0;sin( (pi* (q2x(1,:)+(a/2))) / a );0,0,0];
+
 for iIdx = 1:3
-    ipTmp = sum(gsnn{iIdx}.*Uinc);
-    %bElMtx_EE(iIdx) = gamma * ipTmp * q2w' * det_jac;
-    bElMtx_EE(iIdx) =  gamma*ipTmp * q2w' * det_jac;
+    ipTmp = sum(gsnn{iIdx} .* Uinc);
+    bElMtx_EE(iIdx) = (ipTmp * q2w') * 2*det_jac;
 end
 

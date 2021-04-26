@@ -91,10 +91,9 @@ end
 % K_{ij}
 for iIdx = 1:6
     for jIdx = 1:6
-        maTmp = ones(size(q2w));
-        ipTmp = maTmp.*sum(gcn{iIdx}.*gcn{jIdx});
+        mu = ones(size(q2w));
         er = ma2er(q2x(1,:),q2x(2,:),q2x(3,:));
-        endTemp = k0^2*er.* sum(gin{iIdx}.* gin{jIdx});
-        KElMtx_EE(iIdx,jIdx) = (ipTmp - endTemp) * q2w' * det_jac;
+        ipTmp = mu.*sum(gcn{iIdx}.*gcn{jIdx} - (k0^2)*er.*gin{iIdx}.* gin{jIdx});
+        KElMtx_EE(iIdx,jIdx) = ipTmp * q2w' * det_jac;
     end
 end

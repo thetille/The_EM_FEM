@@ -54,7 +54,16 @@ sMtx_int = sMtx(edIdx_int,edIdx_int);    % mass matrix with conductivity of inte
 cMtx_int = cMtx(:,edIdx_int);            % curl matrix of interiour
 uMtx_int = uMtx;                         % mass matrix with unity coefficient of interiour
 
-edNum_dof = length(edIdx_int); % amount of interiour points
+% eMtx_int = eMtx;
+% sMtx_int = sMtx;
+% cMtx_int = cMtx;
+% uMtx_int = uMtx;
+% 
+% eMtx_int(edIdx_pec,edIdx_pec) = 0;
+% sMtx_int(edIdx_pec,edIdx_pec) = 0;
+% cMtx_int(:,edIdx_pec) = 0;
+
+edNum_dof = length(eMtx_int); % amount of interiour points
 faNum_dof = faNum_all; % total number of faces
 
 
