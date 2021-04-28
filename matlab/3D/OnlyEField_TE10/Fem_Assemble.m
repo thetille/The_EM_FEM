@@ -2,7 +2,7 @@
 % Assemble the global matrices
 % --------------------------------------------------------------
 function [KMtx, BMtx, bMtx] = ...
-    Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2si, fac2no_port1, fac2no_port2)
+    Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2si, fac2no_port1, fac2no_port2, k0, gamma, k_z10, a)
 
 % Arguments:
 %   no2xyz = coordinates of the nodes
@@ -13,13 +13,6 @@ function [KMtx, BMtx, bMtx] = ...
 % Returns:
 
 % need  to incorperate to be more flexible
-a = 0.2;
-c0 = 299792458;
-f = 1*10^9; % 1 ghz
-k0 = (f/c0)^2 * 4*pi^2;
-k_z10 = sqrt(k0^2-(pi/a)^2);
-gamma = 1j*k_z10;
-
 
 
 global ed2noLoc fa2noLoc
@@ -127,7 +120,7 @@ idxRes_EE = 1;
 
 elNum = size(fac2no_port1,2);
 irRes_EE = zeros(incRes_EE*elNum,1); % pre allocation for row index 
-%icRes_EE = zeros(incRes_EE*elNum,1); % pre allocation for column index 
+icRes_EE = ones(incRes_EE*elNum,1); % pre allocation for column index 
 mbRes_EE = zeros(incRes_EE*elNum,1); % pre allocation for data
 
 for no = fac2no_port1 % goes throug the amount of thetras
@@ -157,5 +150,6 @@ for no = fac2no_port1 % goes throug the amount of thetras
 
 end
 
-bMtx = zeros(size(KMtx,1),1);%sparse(irRes_EE, ones(354,1), mbRes_EE, edNumGlo, edNumGlo);
-bMtx(irRes_EE) = mbRes_EE;
+%icRes_EE = ones(size(KMtx,1),1);%sparse(irRes_EE, ones(354,1), mbRes_EE, edNumGlo, edNumGlo);
+%bMtx(irRes_EE) += mbRes_EE;
+bMtx = sparse(irRes_EE, icRes_EE, mbRes_EE, edNumGlo, 1);

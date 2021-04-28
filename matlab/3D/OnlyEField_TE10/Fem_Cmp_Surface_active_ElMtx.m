@@ -12,7 +12,7 @@ function [bElMtx_EE] = ...
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-normals = 0;
+global normals;
 
 % Quadrature rule
 q2u = [[6.666666666666667e-01, ...
@@ -102,9 +102,9 @@ end
 % % Mappings
 % det_jacU = det(jacU);
 
-figure(10), hold on
-scatter(xyz(1,:),xyz(2,:),'g');
-scatter(q2x(1,:),q2x(2,:),'r','x');
+% figure(10), hold on
+% scatter(xyz(1,:),xyz(2,:),'g');
+% scatter(q2x(1,:),q2x(2,:),'r','x');
 
 %xyz = xyz+(a/2); % (the waveguide needs to start at 0 to a
 %Area = 1/2*abs(xyz(1,1)*(xyz(2,2)-xyz(2,3))+ xyz(1,2)*(xyz(2,3)-xyz(2,1)) + xyz(1,3)*(xyz(2,1)-xyz(2,2)));
@@ -113,6 +113,6 @@ Uinc = -2j*k_z10*[0,0,0;sin( (pi* (q2x(1,:)+(a/2))) / a );0,0,0];
 
 for iIdx = 1:3
     ipTmp = sum(gsnn{iIdx} .* Uinc);
-    bElMtx_EE(iIdx) = (ipTmp * q2w') * 2*det_jac;
+    bElMtx_EE(iIdx) = (ipTmp * q2w') *det_jac;
 end
 

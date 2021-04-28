@@ -36,22 +36,22 @@ edNumGlo = ElementDatabase_Cardinal('edges');
 
 
 % Incremental steps for each element
-incRes_NN = 4*4;
-incRes_NE = 4*6;
+incRes_NN = 4*4; % for nodal elements
+incRes_NE = 4*6; % for node to edge elements
 
 % Initializing global counters
 idxRes_NN = 1;
 idxRes_NE = 1;
 
-irRes_NN = zeros(incRes_NN*elNumGlo,1);
-icRes_NN = zeros(incRes_NN*elNumGlo,1);
-msRes_NN = zeros(incRes_NN*elNumGlo,1);
+irRes_NN = zeros(incRes_NN*elNumGlo,1); %placholder for row index
+icRes_NN = zeros(incRes_NN*elNumGlo,1); %placeholder for colum index
+msRes_NN = zeros(incRes_NN*elNumGlo,1); %placholder for results
 
-irRes_NE = zeros(incRes_NE*elNumGlo,1);
-icRes_NE = zeros(incRes_NE*elNumGlo,1);
-mxRes_NE = zeros(incRes_NE*elNumGlo,1);
-myRes_NE = zeros(incRes_NE*elNumGlo,1);
-mzRes_NE = zeros(incRes_NE*elNumGlo,1);
+irRes_NE = zeros(incRes_NE*elNumGlo,1); % row 
+icRes_NE = zeros(incRes_NE*elNumGlo,1); % colum
+mxRes_NE = zeros(incRes_NE*elNumGlo,1); % res for x
+myRes_NE = zeros(incRes_NE*elNumGlo,1); % res for y
+mzRes_NE = zeros(incRes_NE*elNumGlo,1); % res for z
 
 for elIdx = 1:elNumGlo
     
