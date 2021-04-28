@@ -15,7 +15,6 @@ function [iElMtx_NN, iElMtx_NE, iElMtx_NF] = ...
 % Returns:
 %   iElMtx_NN = element projection matrix (phi_i phi_j)
 %   iElMtx_NE = element projection matrix (phi_i N_j)
-%   iElMtx_NF = element projection matrix (phi_i M_j)
 
 % Quadrature rule
 q2r = [[5.854101966249685e-01, ...

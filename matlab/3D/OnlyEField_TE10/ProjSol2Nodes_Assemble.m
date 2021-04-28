@@ -60,44 +60,44 @@ for elIdx = 1:elNumGlo
     
     [iElMtx_NN, iElMtx_NE] = ProjSol2Nodes_CmpElMtx(xyz);
     
-    nsVtr = ones(size(no'));
-    niVtr = no';    
+    nsVtr = ones(size(no')); % direction of node elements (always one)
+    niVtr = no';  %node Id
     
     noTmp = zeros(size(ed2noLoc));
     noTmp(:) = el2no(ed2noLoc(:),elIdx);
-    esVtr = sign(noTmp(2,:)-noTmp(1,:));
-    eiVtr = ElementDatabase_Get('edges', noTmp);
+    esVtr = sign(noTmp(2,:)-noTmp(1,:)); %direction of edges
+    eiVtr = ElementDatabase_Get('edges', noTmp); %Id of edges
     
-    irTmp_NN = niVtr'*ones(size(niVtr));
-    icTmp_NN = ones(size(niVtr'))*niVtr;
+    irTmp_NN = niVtr'*ones(size(niVtr)); %index row for Node to Node
+    icTmp_NN = ones(size(niVtr'))*niVtr; %index colum for Node to Node
     
-    irTmp_NE = niVtr'*ones(size(eiVtr));
-    icTmp_NE = ones(size(niVtr'))*eiVtr;
-    isTmp_NE = nsVtr'*esVtr;
+    irTmp_NE = niVtr'*ones(size(eiVtr)); %index row for Edges to Node
+    icTmp_NE = ones(size(niVtr'))*eiVtr; %index colum for Edges to Node
+    isTmp_NE = nsVtr'*esVtr; %direction for edges
     
-    irRes_NN(idxRes_NN + (1:incRes_NN) - 1) = irTmp_NN(:);
-    icRes_NN(idxRes_NN + (1:incRes_NN) - 1) = icTmp_NN(:);
-    msRes_NN(idxRes_NN + (1:incRes_NN) - 1) = iElMtx_NN(:);
+    irRes_NN(idxRes_NN + (1:incRes_NN) - 1) = irTmp_NN(:); %save rows
+    icRes_NN(idxRes_NN + (1:incRes_NN) - 1) = icTmp_NN(:); %save coulms
+    msRes_NN(idxRes_NN + (1:incRes_NN) - 1) = iElMtx_NN(:); %save result for Node to Node
     
-    irRes_NE(idxRes_NE + (1:incRes_NE) - 1) = irTmp_NE(:);
-    icRes_NE(idxRes_NE + (1:incRes_NE) - 1) = icTmp_NE(:);
-    mxRes_NE(idxRes_NE + (1:incRes_NE) - 1) = isTmp_NE(:).*iElMtx_NE.x(:);
-    myRes_NE(idxRes_NE + (1:incRes_NE) - 1) = isTmp_NE(:).*iElMtx_NE.y(:);
-    mzRes_NE(idxRes_NE + (1:incRes_NE) - 1) = isTmp_NE(:).*iElMtx_NE.z(:);
+    irRes_NE(idxRes_NE + (1:incRes_NE) - 1) = irTmp_NE(:); %save rows
+    icRes_NE(idxRes_NE + (1:incRes_NE) - 1) = icTmp_NE(:); %save coulms
+    mxRes_NE(idxRes_NE + (1:incRes_NE) - 1) = isTmp_NE(:).*iElMtx_NE.x(:); %save x result for Node to edge
+    myRes_NE(idxRes_NE + (1:incRes_NE) - 1) = isTmp_NE(:).*iElMtx_NE.y(:); %save y result for Node to edge
+    mzRes_NE(idxRes_NE + (1:incRes_NE) - 1) = isTmp_NE(:).*iElMtx_NE.z(:); %save z result for Node to edge
     
-    idxRes_NN = idxRes_NN + incRes_NN;
-    idxRes_NE = idxRes_NE + incRes_NE;
+    idxRes_NN = idxRes_NN + incRes_NN; %increment counter (for saving buffer node to node)
+    idxRes_NE = idxRes_NE + incRes_NE; %increment counter (for saving buffer edge to node)
 end
 
-msMtx_NN = sparse(irRes_NN, icRes_NN, msRes_NN, noNumGlo, noNumGlo);
+msMtx_NN = sparse(irRes_NN, icRes_NN, msRes_NN, noNumGlo, noNumGlo); %put result into sparce matrix
 
-mxMtx_NE = sparse(irRes_NE, icRes_NE, mxRes_NE, noNumGlo, edNumGlo);
-myMtx_NE = sparse(irRes_NE, icRes_NE, myRes_NE, noNumGlo, edNumGlo);
-mzMtx_NE = sparse(irRes_NE, icRes_NE, mzRes_NE, noNumGlo, edNumGlo);
+mxMtx_NE = sparse(irRes_NE, icRes_NE, mxRes_NE, noNumGlo, edNumGlo); %put result into sparce matrix
+myMtx_NE = sparse(irRes_NE, icRes_NE, myRes_NE, noNumGlo, edNumGlo); %put result into sparce matrix
+mzMtx_NE = sparse(irRes_NE, icRes_NE, mzRes_NE, noNumGlo, edNumGlo); %put result into sparce matrix
 
-isMtx = diag(1./diag(msMtx_NN));
+isMtx = diag(1./diag(msMtx_NN)); %invers serult of node to node
 
-proj_ed2noMtx.xc = isMtx*mxMtx_NE;
+proj_ed2noMtx.xc = isMtx*mxMtx_NE; 
 proj_ed2noMtx.yc = isMtx*myMtx_NE;
 proj_ed2noMtx.zc = isMtx*mzMtx_NE;
 

@@ -133,7 +133,7 @@ exFld_port2 = exFld_all(noIdx_port2);
 eyFld_port2 = eyFld_all(noIdx_port2);
 ezFld_port2 = ezFld_all(noIdx_port2);
 
-S_parameters(E,ed2no_port1,ed2no_port2,fac2no_port1,fac2no_port2,no2xyz,a)
+S_parameters(eFld_all,fac2no_port1,fac2no_port2,no2xyz,a)
 
 figure(3)
 subplot(1,2,1)
