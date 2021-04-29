@@ -23,7 +23,7 @@ name = name_list[2]
 gmsh.open(name.format(".geo"))
 
 def meshSizeCallback(dim, tag, x, y, z):
-    return 0.04 #- 0.15*z
+    return 0.075 - 0.35*x
 
 gmsh.model.mesh.setSizeCallback(meshSizeCallback)
 
@@ -219,7 +219,7 @@ fa2no_all = fa2no_all.astype('float64')
 ed2no_pec = ed2no_pec.astype('float64')
 
 mdic = {"no2xyz": no2xyz.T, "el2no": el2no.T, "el2ma": el2ma, "ed2no_all": ed2no_all.T, "ed2no_port1": ed2no_port1.T, "ed2no_port2": ed2no_port2.T, "ed2no_bound": ed2no_bound.T, "fa2no_all": fa2no_all.T, "ed2no_pec": ed2no_pec.T, "fac2no_port1": fac2no_port1.T, "fac2no_port2": fac2no_port2.T}
-io.savemat(name.format("_highres.mat"), mdic)
+io.savemat(name.format("_wired.mat"), mdic)
 
 # fig = plt.figure()
 # ax = fig.add_subplot(111, projection='3d')

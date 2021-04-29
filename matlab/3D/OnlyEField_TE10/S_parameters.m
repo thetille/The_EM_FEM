@@ -1,5 +1,5 @@
 function [T_db] = ...
-    S_parameters(E,fac2no_port1,fac2no_port2,no2xyz,a) % need to change from hardcode to adaptive
+    S_parameters(E,fac2no_port1,fac2no_port2,no2xyz,a,k_z10) % need to change from hardcode to adaptive
 
 % ed2no_port1
 % fac2no_port1
@@ -46,8 +46,12 @@ uin{3} = [ug{1}*up{3} - ug{3}*up{1}; 0,0,0];
 % usnn{3} = cross(n,usn{3});
 
 res = 0;
-
-figure(15), clf, hold on
+res2 = 0;
+plot_debug = 1;
+test_res = 0;
+test_res2 = 0;
+test_res3 = 0;
+if plot_debug, figure(15), clf, hold on, end
 for no = fac2no_port2
     
     xyz = no2xyz(:,no);
@@ -64,7 +68,7 @@ for no = fac2no_port2
         q2x = q2x + xyz(:,iIdx)*up{iIdx};
     end
     
-    plot(q2x(1,:),q2x(2,:),'x')
+    if plot_debug, plot(q2x(1,:),q2x(2,:),'x'), end
     
     % Jacobian
     jac = zeros(3);
@@ -79,13 +83,11 @@ for no = fac2no_port2
     det_jac = det(jac);
     map_ccs = inv(jac);   
     
-    Eel = imag(E(eiVtr)).*esVtr';
+    Eel = E(eiVtr).*esVtr';
     
     for iIdx = 1:3
         gin{iIdx} = map_ccs*uin{iIdx};
     end
-    
-    e10 = [0,0,0;sin( (pi* (q2x(1,:)+(a/2))) / a );0,0,0];
     
     % Evaluation of element matrix: phi_i phi_j
     iElMtx_NN = zeros(3);
@@ -93,7 +95,7 @@ for no = fac2no_port2
         for jIdx = 1:3
             bsiTmp = up{iIdx};
             bsjTmp = up{jIdx};
-            iElMtx_NN(iIdx,jIdx) = (bsiTmp.*bsjTmp) * q2w' * det_jac;
+            iElMtx_NN(iIdx,jIdx) = (bsiTmp.*bsjTmp) * q2w';
         end
     end
 
@@ -114,50 +116,85 @@ for no = fac2no_port2
     end
     
     isMtx = diag(1./diag(iElMtx_NN));
+% 
+    Eelxc = isMtx*iElMtx_NE.x*Eel;
+    Eelyc = isMtx*iElMtx_NE.y*Eel;
+    Eelzc = isMtx*iElMtx_NE.z*Eel;
 
-%     Eelxc = isMtx*iElMtx_NE.x*Eel;
-%     Eelyc = isMtx*iElMtx_NE.y*Eel;
-%     Eelzc = isMtx*iElMtx_NE.z*Eel;
+%     Eelxc = iElMtx_NE.x*Eel;
+%     Eelyc = iElMtx_NE.y*Eel;
+%     %Eelzc = iElMtx_NE.z*Eel;
+    
+    if plot_debug, plot([xyz(1,:), xyz(1,1)],[xyz(2,:),xyz(2,1)],'Color',[0.35, 0.35, 0.35]), end
+    
+    %scale = 400;
+    %if plot_debug, quiver(q2x(1,:),q2x(2,:),abs(Eelxc)'*scale,abs(Eelyc)'*scale,'k','AutoScale','off'), end
+    
+    e10 = [0,0,0;sin( (pi* (q2x(1,:)+(a/2))) / a );0,0,0];
+%    if plot_debug, quiver(q2x(1,:),q2x(2,:),e10(1,:)*scale,e10(2,:)*scale,'k','AutoScale','off'), end
+    scale = 10;
+    if plot_debug, quiver(q2x(1,:),q2x(2,:),e10(1,:)*scale*det_jac,e10(2,:)*scale*det_jac,'b','AutoScale','off'), end
+%     
+%     
+     %Eelxc = Eelxc.*(e10(1,:)');
+     %Eelyc = Eelyc.*(e10(2,:)');
+     
+     test_res = test_res + e10(2,:) *det_jac * q2w' ;
+     %test_res2 = test_res2 + abs(Eelyc)' * q2w' ;
+     
+%     Area = 1/2*abs(xyz(1,1)*(xyz(2,2)-xyz(2,3))+ xyz(1,2)*(xyz(2,3)-xyz(2,1)) + xyz(1,3)*(xyz(2,1)-xyz(2,2)));
+%      disp(Area)
+%      disp(det_jac)
+%      disp(det_jac/Area)
+%     
+     %res = res + Eelyc' * q2w'*det_jac;
+     %res2 = res2 + sum(Eelyc)*det_jac;
 
-    Eelxc = iElMtx_NE.x*Eel;
-    Eelyc = iElMtx_NE.y*Eel;
-    %Eelzc = iElMtx_NE.z*Eel;
+     
+    ipTmp = zeros(3,3);
+    %go throug each basis function
+    scale = 10;
+    for basis = 1:3
+        % go thrug each point with in the 3 sampled points in the triangle
+        tmp = gin{basis}*Eel(basis);
+        %quiver(q2x(1,:),q2x(2,:),tmp(1,:)*scale,tmp(2,:)*scale,'AutoScale','off')
+        ipTmp = ipTmp + tmp;
+    end
+    quiver(q2x(1,:),q2x(2,:),abs(ipTmp(1,:)*det_jac)*scale,abs(ipTmp(2,:)*det_jac)*scale,'k','AutoScale','off')
     
-    plot([xyz(1,:), xyz(1,1)],[xyz(2,:),xyz(2,1)],'Color',[0.35, 0.35, 0.35])
+    %ipTmp = ipTmp/3
     
-    scale = 300;
-    quiver(q2x(1,:),q2x(2,:),Eelxc'*scale,Eelyc'*scale,'k','AutoScale','off')
-    
-%     ipTmp = zeros(3,3);
-%     
-%     %go throug each basis function
-%     plot([xyz(1,:), xyz(1,1)],[xyz(2,:),xyz(2,1)],'Color',[0.35, 0.35, 0.35])
-%     scale = 2;
-%     for basis = 1:3
-%         % go thrug each point with in the 3 sampled points in the triangle
-%         tmp = gsnn{basis}*Eel(iIdx)*det_jac;
-%         quiver(q2x(1,:),q2x(2,:),tmp(1,:)*scale,tmp(2,:)*scale,'AutoScale','off')
-%         ipTmp = ipTmp + tmp;
-%     end
-%     
-%     
-%     quiver(q2x(1,:),q2x(2,:),ipTmp(1,:)*scale,ipTmp(2,:)*scale,'k','AutoScale','off')
-%     
-%     %ipTmp = ipTmp/3
-%     
-%     %multiply each point with e10
+%     multiply each point with e10
 %     for point = 1:3
 %        magTemp(point) = ipTmp(:,point)'*e10(:,point);
 %     end
 %     
-%     res = res + magTemp* q2w' %* det_jac;
+     test_res3 = test_res3 + abs(ipTmp(2,:))* q2w' * det_jac;
     
 end
-    
+fprintf("test_res: %f\n",abs(test_res))
+fprintf("test_res2: %f\n",abs(test_res2))
+fprintf("test_res3: %f\n",abs(test_res3))
 %constand before integral, for both R and T
-nrom = @(z) 2*exp(-1j*k_z10*z);
+TRConstant = @(z) (2*exp(-1j*k_z10*z))/(a*a);
 z_val = no2xyz(:,fac2no_port2(:));
 z_val = mean(z_val(3,:));
-T = norm(z_val)*res;
-T_db = 10*log10(T);
+T = abs(TRConstant(z_val)*res);
+T2 = abs(TRConstant(z_val)*res2);
+%T3 = abs(TRConstant(z_val)*res3);
+
+T12 = T^2;
+T22 = T2^2;
+%T32 = T3^2;
+
+fprintf("T: %f \t T^2: %f\n",T,T12)
+fprintf("T2: %f \t T2^2: %f\n",T2,T22)
+
+xlim([-0.1,0.1])
+ylim([-0.1,0.1])
+pbaspect([1,1,1])
+%daspect([1 1 1])
+disp('hej')
+%T_db = 10*log10(T2)
+
 

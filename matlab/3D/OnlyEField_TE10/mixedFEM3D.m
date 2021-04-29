@@ -25,8 +25,8 @@ ma2si = {@(x,y,z) 0};%0.1*exp(-((x+0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
 % z0 = sqrt(m0/e0);   % wave 	 in vacuum
 
 % Read mesh
-file_list = ["cylinder_waveguide2", "waveguide_model3 - simple","waveguide_model3","mesh_cylinder_R0","waveguide_model3_highres"];
-load(file_list(3))
+file_list = ["cylinder_waveguide2", "waveguide_model3 - simple","waveguide_model3","mesh_cylinder_R0","waveguide_model3_highres","waveguide_model3_wired"];
+load(file_list(5))
 
 % ed2no_pec = [ed2no_port1, ed2no_port2, ed2no_bound];
 
@@ -63,8 +63,6 @@ edIdx_port2_int = setdiff(edIdx_port2,edIdx_pec);
 
 %plot to show results, needs to be here in order for normals debug code to
 %work
-figure(3), clf;
-subplot(1,2,1), hold on
 
 [KeMtx, BeMtx, bMtx] = ...
     Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2si, fac2no_port1, fac2no_port2, k0, gamma, k_z10, a);
@@ -102,7 +100,7 @@ KMtx = KeMtx+BeMtx;
 
 pMtx_ed2no = ProjSol2Nodes_Assemble(no2xyz, el2no);
 
-%%
+%
 %A = null(KMtx);
 %E = A(:,1);
 E = KMtx\bMtx;
@@ -133,9 +131,9 @@ exFld_port2 = exFld_all(noIdx_port2);
 eyFld_port2 = eyFld_all(noIdx_port2);
 ezFld_port2 = ezFld_all(noIdx_port2);
 
-S_parameters(eFld_all,fac2no_port1,fac2no_port2,no2xyz,a)
+S_parameters(eFld_all,fac2no_port1,fac2no_port2,no2xyz,a,k_z10)
 
-figure(3)
+figure(3), clf;
 subplot(1,2,1)
 
 for edIdx = 1:size(ed2no_boundery,2)
