@@ -51,6 +51,8 @@ port_list{2} = fac2no_port2;
 
 for port = 1:length(port_list)
     res = 0;
+    int1 = 0;
+    figure(15+port),clf, hold on,
     for no = port_list{port}
 
         xyz = no2xyz(:,no);
@@ -93,8 +95,7 @@ for port = 1:length(port_list)
             ipTmp = ipTmp + tmp;
 
         end
-        
-
+        int1 = int1 + ipTmp * q2w' * det_jac;
 
         %multiply each point with e10
         magTemp = zeros(1,3);
@@ -103,8 +104,8 @@ for port = 1:length(port_list)
         end
         res = res + magTemp * q2w' * det_jac;
          
-%       scale = 10;
-%       figure(15+port), clf, hold on,
+      scale = 10;
+      
 %       plot(q2x(1,:),q2x(2,:),'x')
 %       plot([xyz(1,:), xyz(1,1)],[xyz(2,:),xyz(2,1)],'Color',[0.35, 0.35, 0.35])
 %       quiver(q2x(1,:),q2x(2,:),e10(1,:)*scale*det_jac,e10(2,:)*scale*det_jac,'b','AutoScale','off')

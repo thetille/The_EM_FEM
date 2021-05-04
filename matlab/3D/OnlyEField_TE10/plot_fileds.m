@@ -4,9 +4,43 @@ file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
         ,"waveguide_model3","mesh_cylinder_R0"...
         ,"waveguide_model3_highres","waveguide_model3_wired"...
         ,"waveguide_model3_highHigh"];
-vers = 5;
+vers = 7;
+f = 0.75*10^9;
 
-f = 1.1*10^9;
+load(sprintf('res/%s/Sparamters',file_list(vers)))
+figure(1), clf
+subplot(2,1,1)
+plot(f_list*10^(-9),abs(S_par(:,1)),'DisplayName','S11')
+hold on
+plot(f_list*10^(-9),abs(S_par(:,2)),'DisplayName','S12')
+legend()
+%ylim([0,2])
+
+subplot(2,1,2)
+plot(f_list*10^(-9),angle(S_par(:,1)),'DisplayName','S11')
+hold on
+plot(f_list*10^(-9),angle(S_par(:,2)),'DisplayName','S12')
+legend()
+%ylim([0,2])
+
+
+figure(2), clf
+
+
+subplot(2,1,1)
+plot(f_list*10^(-9),real(S_par(:,1)),'DisplayName','S11')
+hold on
+plot(f_list*10^(-9),imag(S_par(:,1)),'DisplayName','S11')
+legend()
+ylim([0,2])
+subplot(2,1,2)
+plot(f_list*10^(-9),real(S_par(:,2)),'DisplayName','S12')
+hold on
+plot(f_list*10^(-9),imag(S_par(:,2)),'DisplayName','S12')
+legend()
+ylim([0,2])
+
+figure(3), clf;
 filename = sprintf('res/%s/E_filds_f_%.0f',file_list(vers),f*10^-6);
 load(filename);
 
@@ -16,8 +50,6 @@ exFld_all = pMtx_ed2no.xc*eFld_all;
 eyFld_all = pMtx_ed2no.yc*eFld_all;
 ezFld_all = pMtx_ed2no.zc*eFld_all;
 
-
-figure(3), clf;
 subplot(1,2,1)
 
 for edIdx = 1:size(ed2no_boundery,2)

@@ -18,7 +18,7 @@ file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
             ,"waveguide_model3","mesh_cylinder_R0"...
             ,"waveguide_model3_highres","waveguide_model3_wired"...
             ,"waveguide_model3_highHigh"];
-vers = 5
+vers = 7;
 load(file_list(vers))
 
 % Initialize the FEM
@@ -54,9 +54,9 @@ edIdx_port2_int = setdiff(edIdx_port2,edIdx_pec);
 %plot to show results, needs to be here in order for normals debug code to
 %work
 
-f_list = (0.6:0.05:1.5)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
-%f_list = (0.75)*10^9;
-tic
+%f_list = (0.6:0.05:1.5)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
+f_list = (0.75)*10^9;
+
 S_par = zeros(length(f_list),2);
 %parpool(2)
 tic
@@ -79,9 +79,9 @@ for fi = 1:length(f_list)
     KMtx = KeMtx+BeMtx;
     
 
-    %tic
+    tic
     E = KMtx\bMtx;
-    %toc
+    toc
 
     eFld_all = zeros(edNum_all,1); % prealocates memmory and includes edges which are PEC. PEC are zero
     eFld_all(edIdx_int) = E;
@@ -89,6 +89,8 @@ for fi = 1:length(f_list)
 
 
     S_par(fi,:) = S_parameters(eFld_all,fac2no_port1,fac2no_port2,no2xyz,a,k_z10);
+    
+    fprintf("S11: %f + %fi \nS12: %f + %fi \n",real(S_par(fi,1)),imag(S_par(fi,1)),real(S_par(fi,2)),imag(S_par(fi,2)))
     
     filename = sprintf('res/%s/E_filds_f_%.0f',file_list(vers),f*10^-6);
     save(filename,'eFld_all','ed2no_boundery','no2xyz','el2no');

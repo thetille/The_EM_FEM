@@ -25,3 +25,6 @@ octave-workspace
 
 # Python editor
 .spyproject/
+
+#results
+/matlab/3D/OnlyEField_TE10/res/*
