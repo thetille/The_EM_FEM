@@ -1,39 +1,31 @@
 clear all
-figure(10), clf
+
 global normals;
 normals = 0; %enable plotting of port normals
 % Direct or sparse eigenvalue solver for small and large
 % problems, respectively [solver = 'direct' or 'sparse']
 
 a = 0.2;
-c0 = 299792458;
-f = 1*10^9; % 1 ghz
-w = f*2*pi;
-k0 = w*(1/c0);
-k_z10 = sqrt(k0^2-(pi/a)^2);
-gamma = 1j*k_z10;
+c0 = 299792458; % speed of light in vacuum
 
 
 % Materials
 ma2er = {@(x,y,z) 1};% + 4*exp(-((x-0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
 ma2si = {@(x,y,z) 0};%0.1*exp(-((x+0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
 
-% Constants
-% c0 = 299792458;     % speed of light in vacuum
-% m0 = 4*pi*1e-7;     % permeability in vacuum
-% e0 = 1/(m0*c0^2);   % permittivity in vacuum
-% z0 = sqrt(m0/e0);   % wave 	 in vacuum
-
 % Read mesh
-file_list = ["cylinder_waveguide2", "waveguide_model3 - simple","waveguide_model3","mesh_cylinder_R0","waveguide_model3_highres","waveguide_model3_wired"];
-load(file_list(5))
-
-% ed2no_pec = [ed2no_port1, ed2no_port2, ed2no_bound];
+file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
+            ,"waveguide_model3","mesh_cylinder_R0"...
+            ,"waveguide_model3_highres","waveguide_model3_wired"...
+            ,"waveguide_model3_highHigh"];
+vers = 5
+load(file_list(vers))
 
 % Initialize the FEM
 Fem_Init(no2xyz, ed2no_all, fa2no_all)
 ed2no_boundery = ed2no_pec;
 ed2no_pec = ed2no_bound;
+
 % Find PEC edges in the database
 edIdx_pec = ElementDatabase_Get('edges', ed2no_pec); % each edge where pec is present gets an id
 edIdx_port1 = ElementDatabase_Get('edges', ed2no_port1);
@@ -42,8 +34,6 @@ noIdx_pec = unique(ed2no_pec(:))'; % each node where pec is present gets an id
 
 % Find all edges in the database
 edNum_all = ElementDatabase_Cardinal('edges'); % total number of edges
-%faNum_all = ElementDatabase_Cardinal('faces'); % total number of faces
-%only for H field calculations
 edIdx_all = 1:edNum_all; % each edge gets an id
 noIdx_all = 1:size(no2xyz,2); % each node gets an id
 
@@ -64,125 +54,52 @@ edIdx_port2_int = setdiff(edIdx_port2,edIdx_pec);
 %plot to show results, needs to be here in order for normals debug code to
 %work
 
-[KeMtx, BeMtx, bMtx] = ...
-    Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2si, fac2no_port1, fac2no_port2, k0, gamma, k_z10, a);
+f_list = (0.6:0.05:1.5)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
+%f_list = (0.75)*10^9;
+tic
+S_par = zeros(length(f_list),2);
+%parpool(2)
+tic
+for fi = 1:length(f_list)
+    f = f_list(fi);
+    fprintf('frequency: %.2f GHz\n',f*10^(-9))
+    
+    w = f*2*pi;
+    k0 = w*(1/c0);
+    k_z10 = sqrt(k0^2-(pi/a)^2);
+    gamma = 1j*k_z10;
 
-% no2xyz = coordinates to all points
-% el2no = all points in a tetra
-% el2ma = material indices of the tetrahedrons
-% ma2er = stores the permittivity associated with the different material indices
-% ma2si = storesthe conductivity associated with the different material indices
-% fac2no_port1 = The triangles in port1
-% fac2no_port2 = The triangles in port2
+    [KeMtx, BeMtx, bMtx] = ...
+        Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2si, fac2no_port1, fac2no_port2, k0, gamma, k_z10, a);
 
-% sparce to full
-%KeMtx = full(KeMtx);
-%BeMtx = full(BeMtx);
+    KeMtx = KeMtx(edIdx_int,edIdx_int);
 
-%set pec bounderys (edge elements) to 0
-% KeMtx(edIdx_pec,edIdx_pec) = 0;
-% KeMtx(edIdx_port1,edIdx_port1) = 1;
-% KeMtx(edIdx_port2,edIdx_port2) = 0;
+    bMtx = bMtx(edIdx_int);
+    BeMtx = BeMtx(edIdx_int,edIdx_int);
+    KMtx = KeMtx+BeMtx;
+    
 
-%KeMtx(edIdx_port1_int,edIdx_port1_int) = 0;
-%KeMtx(edIdx_port2_int,edIdx_port2_int) = 0;
-KeMtx = KeMtx(edIdx_int,edIdx_int);
+    %tic
+    E = KMtx\bMtx;
+    %toc
+
+    eFld_all = zeros(edNum_all,1); % prealocates memmory and includes edges which are PEC. PEC are zero
+    eFld_all(edIdx_int) = E;
+    %eFld_all(edIdx_int) = bMtx;
 
 
-%bMtx(intersect(edIdx_port1,edIdx_pec)) = 0;
-bMtx = bMtx(edIdx_int);
-% bMtx = diag(bMtx);
-%BeMtx_inter = intersect([edIdx_port1,edIdx_port2],edIdx_pec);
-%BeMtx(BeMtx_inter,BeMtx_inter) = 0;
-%edIdx_int = setdiff([edIdx_port1,edIdx_port2],edIdx_pec);
-BeMtx = BeMtx(edIdx_int,edIdx_int);
-KMtx = KeMtx+BeMtx;
-
-pMtx_ed2no = ProjSol2Nodes_Assemble(no2xyz, el2no);
-
-%
-%A = null(KMtx);
-%E = A(:,1);
-E = KMtx\bMtx;
-
-eFld_all = zeros(edNum_all,1); % prealocates memmory and includes edges which are PEC. PEC are zero
-eFld_all(edIdx_int) = E;
-%eFld_all(edIdx_int) = bMtx;
-
-%E(edIdx_pec) = 0;
-exFld_all = pMtx_ed2no.xc*eFld_all;
-eyFld_all = pMtx_ed2no.yc*eFld_all;
-ezFld_all = pMtx_ed2no.zc*eFld_all;
-% 
-% exFld_all = pMtx_ed2no.xc*bMtx';
-% eyFld_all = pMtx_ed2no.yc*bMtx';
-% ezFld_all = pMtx_ed2no.zc*bMtx';
-%dVal = max(no2xyz,[],'all')*1.2;
-
-%get fields at port 1
-noIdx_port1 = unique(fac2no_port1(:));
-exFld_port1 = exFld_all(noIdx_port1);
-eyFld_port1 = eyFld_all(noIdx_port1);
-ezFld_port1 = ezFld_all(noIdx_port1);
-
-%get fields at port 2
-noIdx_port2 = unique(fac2no_port2(:));
-exFld_port2 = exFld_all(noIdx_port2);
-eyFld_port2 = eyFld_all(noIdx_port2);
-ezFld_port2 = ezFld_all(noIdx_port2);
-
-S_parameters(eFld_all,fac2no_port1,fac2no_port2,no2xyz,a,k_z10)
-
-figure(3), clf;
-subplot(1,2,1)
-
-for edIdx = 1:size(ed2no_boundery,2)
-    noTmp = ed2no_boundery(:,edIdx);
-    xyzTmp = no2xyz(:,noTmp);
-    plot3(xyzTmp(1,:), xyzTmp(2,:), xyzTmp(3,:), ...
-        'Color', 0.5*[1 1 1])
+    S_par(fi,:) = S_parameters(eFld_all,fac2no_port1,fac2no_port2,no2xyz,a,k_z10);
+    
+    filename = sprintf('res/%s/E_filds_f_%.0f',file_list(vers),f*10^-6);
+    save(filename,'eFld_all','ed2no_boundery','no2xyz','el2no');
+    %plot_fileds(eFld_all,ed2no_boundery,no2xyz)
 end
-exViz = real(exFld_all(:).');
-eyViz = real(eyFld_all(:).');
-ezViz = real(ezFld_all(:).');
-quiverC3D(no2xyz(1,:)', no2xyz(2,:)', no2xyz(3,:)', ...
-    exViz', eyViz', ezViz',1)
-set(gca,'Color',[0,27/100,55/100])
-axis equal
-%axis off
-view(40,-20)
+toc
+figure(1), clf
+plot(f_list*10^(-9),abs(S_par(:,1)),'DisplayName','S11')
+hold on
+plot(f_list*10^(-9),abs(S_par(:,2)),'DisplayName','S12')
+legend()
+ylim([0,2])
+save(sprintf('res/%s/Sparamters',file_list(vers)),'S_par','f_list')
 
-subplot(1,2,2), hold on
-
-for edIdx = 1:size(ed2no_boundery,2)
-    noTmp = ed2no_boundery(:,edIdx);
-    xyzTmp = no2xyz(:,noTmp);
-    plot3(xyzTmp(1,:), xyzTmp(2,:), xyzTmp(3,:), ...
-        'Color', 0.5*[1 1 1])
-end
-exViz = imag(exFld_all(:).');
-eyViz = imag(eyFld_all(:).');
-ezViz = imag(ezFld_all(:).');
-quiverC3D(no2xyz(1,:)', no2xyz(2,:)', no2xyz(3,:)', ...
-    exViz', eyViz', ezViz',1)
-set(gca,'Color',[0,27/100,55/100])
-
-axis equal
-%axis off
-view(40,-20)
-
-X =  no2xyz(1,:);
-Y =  no2xyz(2,:);
-Z =  no2xyz(3,:);
-
-V = abs(exViz)+abs(eyViz)+abs(ezViz);
-
-res = [0.005,0.005,0.005];
-[Xq,Yq,Zq] = meshgrid(-0.1:res(1):0.1, -.1:res(2):.1 ,0:res(3):0.4);
-Vq = griddata(X,Y,Z,V,Xq,Yq,Zq);
-
-figure(5), clf;
-slice(Xq,Yq,Zq,Vq,[-0.1 0.1],[-0.1 0.1],[0 0.4]);
-shading flat
-pbaspect([1 1 1])
-view(40,-14+(rand(1)*0.1))

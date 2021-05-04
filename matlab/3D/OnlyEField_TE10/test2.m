@@ -2,7 +2,7 @@
 clear
 %generate v,u cordinates
 % 
-res = 0.1;
+res = 0.099;
 point = [0,0];
 
 q2u = [[6.666666666666667e-01, ...
@@ -125,7 +125,7 @@ quiver(u,v,nS3(1,:),nS3(2,:))
 
 sgtitle("n x S functions")
 
-
+%%
 figure(7), clf, hold on
 a = 10;
 ranTri = rand(2,3)*a;
@@ -146,17 +146,17 @@ quiver(x,y,q*scale,w*scale,'Autoscale', 'off')
 
 q2uTx = ranTri(1,1)+(ranTri(1,2)-ranTri(1,1))*q2u(2,:)+(ranTri(1,3)-ranTri(1,1))*q2u(1,:);
 q2uTy = ranTri(2,1)+(ranTri(2,2)-ranTri(2,1))*q2u(2,:)+(ranTri(2,3)-ranTri(2,1))*q2u(1,:);
-scatter(q2uTx,q2uTy);
+scatter(q2uTx,q2uTy,'x');
 
 qIn = zeros(size(q2uTx));
-wIn = [1,1,1];%sin((pi*q2uTx)./a);
+%wIn = [1,1,1];
+wIn = sin(pi*q2uTx/a);
 
 quiver(q2uTx,q2uTy,qIn*scale,wIn*scale,'g','Autoscale', 'off')
 
 xlim([-1,11])
 ylim([-1,11])
 
-%%
 
 % ipTmp = sum([qIn; wIn; qIn]);
 % ipTmp * q2w' * det_jac;
@@ -172,27 +172,33 @@ for iIdx = 1:3
     jac = jac ...
         + [xyz(1,iIdx)*ug{iIdx}', 0; ...
            xyz(2,iIdx)*ug{iIdx}', 0; ...
-           xyz(3,iIdx)*ug{iIdx}', 1]';
+           xyz(3,iIdx)*ug{iIdx}', 0]';
 end
-
+jac(3,3) = 1;
 %hige res points in triangle
 
 jacU = zeros(3);
-jacU = [xyz(1,3)-xyz(1,3), xyz(1,2)-xyz(1,1); ...
+jacU = [xyz(1,3)-xyz(1,1), xyz(1,2)-xyz(1,1); ...
         xyz(2,3)-xyz(2,1), xyz(2,2)-xyz(2,1)];
 
-q2w = [1.666666666666667e-02; ...
-       1.666666666666667e-02; ...
-       1.666666666666667e-02]';
+q2w = [1.666666666666667e-01; ...
+       1.666666666666667e-01; ...
+       1.666666666666667e-01]';
    
    
-Tx = ranTri(1,1)+(ranTri(1,2)-ranTri(1,1))*u+(ranTri(1,3)-ranTri(1,1))*v;
-Ty = ranTri(2,1)+(ranTri(2,2)-ranTri(2,1))*u+(ranTri(2,3)-ranTri(2,1))*v;
+%Tx = ranTri(1,1)+(ranTri(1,2)-ranTri(1,1))*u+(ranTri(1,3)-ranTri(1,1))*v;
+%Ty = ranTri(2,1)+(ranTri(2,2)-ranTri(2,1))*u+(ranTri(2,3)-ranTri(2,1))*v;
 
-scatter(Tx,Ty,'x')
+%scatter(Tx,Ty,'x')
 
-Area = 1/2*abs(xyz(1,1)*(xyz(2,2)-xyz(2,3))+ xyz(1,2)*(xyz(2,3)-xyz(2,1)) + xyz(1,3)*(xyz(2,1)-xyz(2,2)))
-Area_estimate = [1,1,1]*q2w'*det(jacU)
+Area = 1/2*abs(xyz(1,1)*(xyz(2,2)-xyz(2,3))+ xyz(1,2)*(xyz(2,3)-xyz(2,1)) + xyz(1,3)*(xyz(2,1)-xyz(2,2)));
+Area_estimate = [1,1,1]*q2w'*det(jac);
+fprintf("Area: %f\n",Area);
+fprintf("Det_jac: %f\n",det(jac))
+fprintf("Det_jac*0.5: %f\n",det(jac)*0.5)
+fprintf("estimat: %f\n",Area_estimate);
+fprintf("Area/estimat: %f\n",Area/Area_estimate);
+fprintf("estimat/Area: %f\n",Area_estimate/Area);
 
 % 
 % num_of_points = 100;
