@@ -18,7 +18,7 @@ file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
             ,"waveguide_model3","mesh_cylinder_R0"...
             ,"waveguide_model3_highres","waveguide_model3_wired"...
             ,"waveguide_model3_highHigh"];
-vers = 7;
+vers = 5;
 load(file_list(vers))
 
 % Initialize the FEM
@@ -54,8 +54,8 @@ edIdx_port2_int = setdiff(edIdx_port2,edIdx_pec);
 %plot to show results, needs to be here in order for normals debug code to
 %work
 
-%f_list = (0.6:0.05:1.5)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
-f_list = (0.75)*10^9;
+f_list = (0.6:0.05:1.5)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
+%f_list = (0.75)*10^9;
 
 S_par = zeros(length(f_list),2);
 %parpool(2)
@@ -67,7 +67,14 @@ for fi = 1:length(f_list)
     w = f*2*pi;
     k0 = w*(1/c0);
     k_z10 = sqrt(k0^2-(pi/a)^2);
-    gamma = 1j*k_z10;
+    %gamma = 1j*k_z10;
+    if (pi/a)^2 <= k0^2
+        gamma = sqrt(((pi/a).^2)-k0.^2);
+        disp('hej1')
+    else
+        gamma = 1j*k_z10;
+        disp('hej2')
+    end
 
     [KeMtx, BeMtx, bMtx] = ...
         Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2si, fac2no_port1, fac2no_port2, k0, gamma, k_z10, a);
@@ -102,6 +109,6 @@ plot(f_list*10^(-9),abs(S_par(:,1)),'DisplayName','S11')
 hold on
 plot(f_list*10^(-9),abs(S_par(:,2)),'DisplayName','S12')
 legend()
-ylim([0,2])
+%ylim([0,2])
 save(sprintf('res/%s/Sparamters',file_list(vers)),'S_par','f_list')
 

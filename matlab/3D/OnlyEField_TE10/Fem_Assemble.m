@@ -33,7 +33,7 @@ idxRes_EE = 1;
 irRes_EE = zeros(incRes_EE*elNumGlo,1); % pre allocation for row index 
 icRes_EE = zeros(incRes_EE*elNumGlo,1); % pre allocation for column index 
 mKRes_EE = zeros(incRes_EE*elNumGlo,1); % pre allocation for data
-tic
+
 for elIdx = 1:elNumGlo % goes throug the amount of thetras
     
     no = el2no(:,elIdx); % current nodes (corners / points)
@@ -61,7 +61,7 @@ for elIdx = 1:elNumGlo % goes throug the amount of thetras
     idxRes_EE = idxRes_EE + incRes_EE; % incerment pointer for edge edge
 
 end
-toc
+
 KMtx = sparse(irRes_EE, icRes_EE, mKRes_EE, edNumGlo, edNumGlo);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Asemble the B matrix, impedance boundery for all ports %%%%%%%%%%%
@@ -80,7 +80,7 @@ mBRes_EE = zeros(incRes_EE*elNum,1); % pre allocation for data
 port{1} = fac2no_port1;
 port{2} = fac2no_port2;
 direction = [-1,1];
-tic
+
 for port_num = 1:2
     for no = port{port_num} % goes throug the amount of thetras
 
@@ -109,7 +109,7 @@ for port_num = 1:2
 
     end
 end
-toc
+
 BMtx = sparse(irRes_EE, icRes_EE, mBRes_EE, edNumGlo, edNumGlo);
 
 % %%%%%%%%%%%%%%%%%%%% small b active port %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -124,7 +124,7 @@ elNum = size(fac2no_port1,2);
 irRes_EE = zeros(incRes_EE*elNum,1); % pre allocation for row index 
 icRes_EE = ones(incRes_EE*elNum,1); % pre allocation for column index 
 mbRes_EE = zeros(incRes_EE*elNum,1); % pre allocation for data
-tic
+
 for no = fac2no_port1 % goes throug the amount of thetras
     
     %no = el2no(:,elIdx); % current nodes (corners / points)
@@ -151,7 +151,7 @@ for no = fac2no_port1 % goes throug the amount of thetras
     idxRes_EE = idxRes_EE + incRes_EE; % incerment pointer for edge edge
 
 end
-toc
+
 %icRes_EE = ones(size(KMtx,1),1);%sparse(irRes_EE, ones(354,1), mbRes_EE, edNumGlo, edNumGlo);
 %bMtx(irRes_EE) += mbRes_EE;
 bMtx = sparse(irRes_EE, icRes_EE, mbRes_EE, edNumGlo, 1);

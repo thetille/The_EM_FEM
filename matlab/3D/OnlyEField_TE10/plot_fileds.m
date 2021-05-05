@@ -1,10 +1,10 @@
 %function plot_fileds()%(eFld_all,ed2no_boundery,no2xyz)
-
+clear
 file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
         ,"waveguide_model3","mesh_cylinder_R0"...
         ,"waveguide_model3_highres","waveguide_model3_wired"...
         ,"waveguide_model3_highHigh"];
-vers = 7;
+vers = 5;
 f = 0.75*10^9;
 
 load(sprintf('res/%s/Sparamters',file_list(vers)))

@@ -52,6 +52,10 @@ port_list{2} = fac2no_port2;
 for port = 1:length(port_list)
     res = 0;
     int1 = 0;
+    test_res = 0;
+    test_res2 = 0;
+    test_res3 = 0;
+    test_res4 = 0;
     figure(15+port),clf, hold on,
     for no = port_list{port}
 
@@ -80,11 +84,48 @@ for port = 1:length(port_list)
 
         % Mappings
         det_jac = det(jac);
+        map_ccs = inv(jac);
 
         gin = cell(3,1);
         for iIdx = 1:3
-            gin{iIdx} = jac\uin{iIdx};  % sam as map_ccs = inv(jac); , uni{iIdx} * map_css
+            gin{iIdx} = map_ccs*uin{iIdx};  % sam as map_ccs = inv(jac); , uni{iIdx} * map_css
         end
+        
+        % Evaluation of element matrix: phi_i phi_j
+        iElMtx_NN = zeros(3);
+        for iIdx = 1:3
+            for jIdx = 1:3
+                bsiTmp = up{iIdx};
+                bsjTmp = up{jIdx};
+                iElMtx_NN(iIdx,jIdx) = (bsiTmp.*bsjTmp) * q2w' * det_jac;
+            end
+        end
+
+        % Evaluation of element matrix: phi_i (x * Nj)
+        iElMtx_NE.x = zeros(3,3);
+        iElMtx_NE.y = zeros(3,3);
+        iElMtx_NE.z = zeros(3,3);
+        for iIdx = 1:3
+            for jIdx = 1:3
+                bsiTmp = up{iIdx};
+                bxjTmp = gin{jIdx}(1,:);
+                byjTmp = gin{jIdx}(2,:);
+                bzjTmp = gin{jIdx}(3,:);
+                iElMtx_NE.x(iIdx,jIdx) = (bsiTmp.*bxjTmp) * q2w' * det_jac;
+                iElMtx_NE.y(iIdx,jIdx) = (bsiTmp.*byjTmp) * q2w' * det_jac;
+                iElMtx_NE.z(iIdx,jIdx) = (bsiTmp.*bzjTmp) * q2w' * det_jac;
+            end
+        end
+
+        isMtx = diag(1./diag(iElMtx_NN));
+    % 
+        Eelxc = isMtx*iElMtx_NE.x*Eel;
+        Eelyc = isMtx*iElMtx_NE.y*Eel;
+        Eelzc = isMtx*iElMtx_NE.z*Eel;
+
+        Eelxc2 = iElMtx_NE.x*Eel;
+        Eelyc2 = iElMtx_NE.y*Eel;
+        Eelzc2 = iElMtx_NE.z*Eel;
 
         e10 = [0,0,0;sin( (pi* (q2x(1,:)+(a/2))) / a );0,0,0];
         %go throug each basis function
@@ -103,16 +144,30 @@ for port = 1:length(port_list)
            magTemp(point) = ipTmp(:,point)'*e10(:,point)*0.5; % the 0.5 is not part of the equation and it would be best if it was not there.
         end
         res = res + magTemp * q2w' * det_jac;
-         
-      scale = 10;
-      
+        
+        test_res = test_res + (e10(2,:) * q2w' *det_jac) ;
+        test_res2 = test_res2 + Eelyc' * q2w' ;
+        test_res3 = test_res3 + Eelyc2' * q2w';
+%         scale = 10000;
+%         fprintf("e10(2,:): %f + %fi\n",real(e10(2,:)*det_jac*scale),imag(e10(2,:)*det_jac*scale))
+%         fprintf("Eelyc2: %f + %fi\n",real(Eelyc2)*scale,imag(Eelyc2)*scale)
+%          
+%       scale = 10;
+%       
 %       plot(q2x(1,:),q2x(2,:),'x')
 %       plot([xyz(1,:), xyz(1,1)],[xyz(2,:),xyz(2,1)],'Color',[0.35, 0.35, 0.35])
 %       quiver(q2x(1,:),q2x(2,:),e10(1,:)*scale*det_jac,e10(2,:)*scale*det_jac,'b','AutoScale','off')
-%       quiver(q2x(1,:),q2x(2,:),abs(ipTmp(1,:)*det_jac)*scale,abs(ipTmp(2,:)*det_jac)*scale,'k','AutoScale','off')
+%       scale = 10000;
+%       plot_var = [Eelxc2'; Eelyc2'; Eelzc2'];%[Eelxc'; Eelyc'; Eelzc'];
+%       quiver(q2x(1,:),q2x(2,:),abs(plot_var(1,:)*det_jac)*scale,abs(plot_var(2,:)*det_jac)*scale,'k','AutoScale','off')
     end
+%     fprintf("test_res: %f\n",abs(test_res))
+%     fprintf("test_res2: %f\n",abs(test_res2))
+%     fprintf("test_res3: %f\n",abs(test_res3))
+%     fprintf("test_res4: %f\n",abs(test_res4))
+%     fprintf("test_res4/2: %f\n",abs(test_res4)/2)
     %constand before integral, for both R and T
-    TRConstant = @(z) (2/(a*a));
+    TRConstant = @(z) ( (2*exp(1j*k_z10)) / (a*a) );
     z_val = no2xyz(:,fac2no_port2(:));
     z_val = mean(z_val(3,:));
     S_par(port) = (TRConstant(z_val)*res)^2;
