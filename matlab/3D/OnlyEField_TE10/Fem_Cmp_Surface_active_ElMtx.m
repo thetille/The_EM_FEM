@@ -109,8 +109,8 @@ end
 
 %xyz = xyz+(a/2); % (the waveguide needs to start at 0 to a
 %Area = 1/2*abs(xyz(1,1)*(xyz(2,2)-xyz(2,3))+ xyz(1,2)*(xyz(2,3)-xyz(2,1)) + xyz(1,3)*(xyz(2,1)-xyz(2,2)));
-E0 = 10;
-Uinc = -2j*k_z10*E0*[0,0,0;sin( (pi* (q2x(1,:)+(a/2))) / a );0,0,0];
+
+Uinc = -2j*k_z10*[0,0,0;sin( (pi* (q2x(1,:)+(a/2))) / a );0,0,0].*exp(-1j*k_z10*0); %needs z in exponent
 
 for iIdx = 1:3
     ipTmp = sum(gsnn{iIdx} .* Uinc);

@@ -18,12 +18,12 @@ import scipy.io as io
 
 gmsh.initialize(sys.argv)
 
-name_list = ["cylinder_waveguide{}","waveguide_model2{}","waveguide_model3{}","waveguide_model3 - simple{}"]
-name = name_list[2]
+name_list = ["cylinder_waveguide{}","waveguide_model2{}","waveguide_model3{}","waveguide_model3 - simple{}","waveguide_model3_flat{}","waveguide_model3_flat_long{}"]
+name = name_list[5]
 gmsh.open(name.format(".geo"))
 
 def meshSizeCallback(dim, tag, x, y, z):
-    return 0.009 #- 0.35*x
+    return 0.045 #- 0.35*x
 
 gmsh.model.mesh.setSizeCallback(meshSizeCallback)
 
@@ -219,7 +219,7 @@ fa2no_all = fa2no_all.astype('float64')
 ed2no_pec = ed2no_pec.astype('float64')
 
 mdic = {"no2xyz": no2xyz.T, "el2no": el2no.T, "el2ma": el2ma, "ed2no_all": ed2no_all.T, "ed2no_port1": ed2no_port1.T, "ed2no_port2": ed2no_port2.T, "ed2no_bound": ed2no_bound.T, "fa2no_all": fa2no_all.T, "ed2no_pec": ed2no_pec.T, "fac2no_port1": fac2no_port1.T, "fac2no_port2": fac2no_port2.T}
-io.savemat(name.format("_highHigh.mat"), mdic)
+io.savemat(name.format("highHigh.mat"), mdic)
 
 # fig = plt.figure()
 # ax = fig.add_subplot(111, projection='3d')

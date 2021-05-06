@@ -60,27 +60,32 @@ f_list = (0.6:0.05:1.5)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
 S_par = zeros(length(f_list),2);
 %parpool(2)
 tic
+f_list = f_list(10:16);
 for fi = 1:length(f_list)
     f = f_list(fi);
     fprintf('frequency: %.2f GHz\n',f*10^(-9))
     
     w = f*2*pi;
     k0 = w*(1/c0);
-    k_z10 = sqrt(k0^2-(pi/a)^2);
-    %gamma = 1j*k_z10;
-    if (pi/a)^2 <= k0^2
-        gamma = sqrt(((pi/a).^2)-k0.^2);
-        disp('hej1')
-    else
-        gamma = 1j*k_z10;
-        disp('hej2')
-    end
+    k_z10 = sqrt((k0^2)-(pi/a)^2);
+    gamma = 1j*k_z10;
+%     if (pi/a)^2 <= k0^2
+%         %k_z10 = sqrt(((pi/a).^2)-k0.^2);
+%         gamma = sqrt(((pi/a).^2)-k0.^2);
+%         disp('gamma2')
+%     else
+%         %k_z10 = sqrt(k0^2-(pi/a)^2);
+%         gamma = 1j*k_z10;
+%         disp('gamma1')
+%     end
 
     [KeMtx, BeMtx, bMtx] = ...
         Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2si, fac2no_port1, fac2no_port2, k0, gamma, k_z10, a);
 
     KeMtx = KeMtx(edIdx_int,edIdx_int);
-
+    KeMtx(edIdx_port1_int,edIdx_port1_int) = 0;
+    KeMtx(edIdx_port2_int,edIdx_port2_int) = 0;
+    
     bMtx = bMtx(edIdx_int);
     BeMtx = BeMtx(edIdx_int,edIdx_int);
     KMtx = KeMtx+BeMtx;
@@ -99,7 +104,7 @@ for fi = 1:length(f_list)
     
     fprintf("S11: %f + %fi \nS12: %f + %fi \n",real(S_par(fi,1)),imag(S_par(fi,1)),real(S_par(fi,2)),imag(S_par(fi,2)))
     
-    filename = sprintf('res/%s/E_filds_f_%.0f',file_list(vers),f*10^-6);
+    filename = sprintf('res/%s/old_Uinc_exponent/E_filds_f_%.0f',file_list(vers),f*10^-6);
     save(filename,'eFld_all','ed2no_boundery','no2xyz','el2no');
     %plot_fileds(eFld_all,ed2no_boundery,no2xyz)
 end
