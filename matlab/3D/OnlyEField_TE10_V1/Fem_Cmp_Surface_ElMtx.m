@@ -50,9 +50,9 @@ if normals
     quiver3(xyz(1,:),xyz(2,:),xyz(3,:),n(1,:)*scale,n(2,:)*scale,n(3,:)*scale,'Autoscale', 'off')
 end
 
-usn{1} = cross(n,uin{1});
-usn{2} = cross(n,uin{2});
-usn{3} = cross(n,uin{3});
+% usn{1} = cross(n,uin{1});
+% usn{2} = cross(n,uin{2});
+% usn{3} = cross(n,uin{3});
 
 % Physical coordinates
 % Maps from refference element to physical element
@@ -77,15 +77,20 @@ map_ccs = inv(jac);      % mapping for curl-conforming space
 %map_dcs = jac'/det_jac;  % mapping for div-conforming space
 
 for iIdx = 1:3
-    gsn{iIdx} = map_ccs*usn{iIdx};
+    gsn{iIdx} = map_ccs*uin{iIdx};
 end
 
+usn{1} = cross(n,gsn{1});
+usn{2} = cross(n,gsn{2});
+usn{3} = cross(n,gsn{3});
 
-% B_{ij} ElMtx [j^{-1}] n x < N
+%Area = 1/2*abs(xyz(1,1)*(xyz(2,2)-xyz(2,3))+ xyz(1,2)*(xyz(2,3)-xyz(2,1)) + xyz(1,3)*(xyz(2,1)-xyz(2,2)));
+
+% B_{ij} ElMtx [j^{-1}] n x N
 for iIdx = 1:3
     for jIdx = 1:3
         %maTmp = ones(size(q2w));
-        ipTmp = sum(gsn{iIdx}.* gsn{jIdx});
+        ipTmp = sum(usn{iIdx}.* usn{jIdx});
         BElMtx_EE(iIdx,jIdx) =  gamma* ipTmp * q2w' * det_jac;
     end
 end

@@ -49,18 +49,13 @@ if normals
     scale = 0.05;
     quiver3(xyz(1,:),xyz(2,:),xyz(3,:),n(1,:)*scale,n(2,:)*scale,n(3,:)*scale,'Autoscale', 'off')
 end
-%S, n x N
-usn{1} = cross(n,uin{1});
-usn{2} = cross(n,uin{2});
-usn{3} = cross(n,uin{3});
+
+
 % usn{1} = [-up{1}*ug{2}(2)+up{2}*ug{1}(2); up{1}*ug{2}(1)-up{2}*ug{1}(1); 0,0,0];
 % usn{2} = [-up{2}*ug{3}(2)+up{3}*ug{2}(2); up{2}*ug{3}(1)-up{3}*ug{2}(1); 0,0,0];
 % usn{3} = [-up{3}*ug{1}(2)+up{1}*ug{3}(2); up{3}*ug{1}(1)-up{1}*ug{3}(1); 0,0,0];
 
-%n x S (n x (n x S)) 
-usnn{1} = cross(n,usn{1});
-usnn{2} = cross(n,usn{2});
-usnn{3} = cross(n,usn{3});
+
 % usnn{1} = [-up{1}*ug{2}(1)+up{2}*ug{1}(1); -up{1}*ug{2}(2)+up{2}*ug{1}(2); 0,0,0];
 % usnn{2} = [-up{2}*ug{3}(1)+up{3}*ug{2}(1); -up{2}*ug{3}(2)+up{3}*ug{2}(2); 0,0,0];
 % usnn{3} = [-up{3}*ug{1}(1)+up{1}*ug{3}(1); -up{3}*ug{1}(2)+up{1}*ug{3}(2); 0,0,0];
@@ -91,8 +86,18 @@ map_ccs = inv(jac);       % mapping for curl-conforming space
 
 
 for iIdx = 1:3
-    gsnn{iIdx} = map_ccs*usnn{iIdx};
+    gin{iIdx} = map_ccs*uin{iIdx};
 end
+%S, n x N
+usn{1} = cross(n,gin{1});
+usn{2} = cross(n,gin{2});
+usn{3} = cross(n,gin{3});
+
+
+%n x S (n x (n x S)) 
+usnn{1} = cross(n,usn{1});
+usnn{2} = cross(n,usn{2});
+usnn{3} = cross(n,usn{3});
 
 
 %b_{ij} ElMtx n x n x [j^{-1}]N * U_inc
@@ -102,7 +107,7 @@ end
 %         xyz(2,3)-xyz(2,1), xyz(2,2)-xyz(2,1)];
 % % Mappings
 % det_jacU = det(jacU);
-
+% 
 % figure(10), hold on
 % scatter(xyz(1,:),xyz(2,:),'g');
 % scatter(q2x(1,:),q2x(2,:),'r','x');
@@ -111,9 +116,11 @@ end
 %Area = 1/2*abs(xyz(1,1)*(xyz(2,2)-xyz(2,3))+ xyz(1,2)*(xyz(2,3)-xyz(2,1)) + xyz(1,3)*(xyz(2,1)-xyz(2,2)));
 
 Uinc = -2j*k_z10*E0*[0,0,0;sin((pi*(q2x(1,:)+(a/2))) / a );0,0,0].*exp(-1j*k_z10*0); %needs z in exponent
+% scale = 0.001;
+% quiver(q2x(1,:),q2x(2,:),Uinc(1,:),imag(Uinc(2,:)*scale),'Autoscale', 'off')
 
 for iIdx = 1:3
-    ipTmp = sum(gsnn{iIdx} .* Uinc);
+    ipTmp = sum(usnn{iIdx} .* Uinc);
     bElMtx_EE(iIdx) = (ipTmp * q2w') *det_jac;
 end
 

@@ -72,7 +72,7 @@ incRes_EE = 3*3; % edge * edge
 % properties
 idxRes_EE = 1;
 
-elNum = size(fac2no_port1,2)+size(fac2no_port1,2);
+elNum = size(fac2no_port1,2)+size(fac2no_port2,2);
 irRes_EE = zeros(incRes_EE*elNum,1); % pre allocation for row index 
 icRes_EE = zeros(incRes_EE*elNum,1); % pre allocation for column index 
 mBRes_EE = zeros(incRes_EE*elNum,1); % pre allocation for data

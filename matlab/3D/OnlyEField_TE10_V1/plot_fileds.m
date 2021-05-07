@@ -5,8 +5,8 @@ file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
         ,"waveguide_model3_highres","waveguide_model3_wired"...
         ,"waveguide_model3_highHigh","waveguide_model3_flat_long"];
 vers = 3;
-save_folder = 'normals3';
-f = 1.35*10^9;
+save_folder = 'test3';
+f = 1.65*10^9;
 
 load(sprintf('res/%s/%s/Sparamters',file_list(vers),save_folder))
 figure(10), clf

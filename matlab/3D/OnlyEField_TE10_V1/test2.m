@@ -11,7 +11,10 @@ q2u = [[6.666666666666667e-01, ...
         6.666666666666667e-01]; ...
        [1.666666666666667e-01, ...
         1.666666666666667e-01]]';
-
+q2w = [1.666666666666667e-01; ...
+       1.666666666666667e-01; ...
+       1.666666666666667e-01]';
+    
 u = [];
 v = [];
 while point(1) < 1
@@ -24,11 +27,14 @@ while point(1) < 1
     point(2) = 0;
 end
 
+% transforms from refrance space to physical space 
+a = 10;
+xyz = rand(2,3)*a;
+
 
 figure(1), clf
 scatter(u,v); hold on
 scatter(q2u(1,:),q2u(2,:),'g')
-
 
 figure(2), clf
 phi1 = 1-u-v;
@@ -62,6 +68,36 @@ subplot(3,1,3)
 quiver(u,v,gPhi3(1,:)*scale,gPhi3(2,:)*scale, 'Autoscale', 'off' ), hold on
 quiver(q2u(1,:),q2u(2,:),gPhi3In(1,:)*scale,gPhi3In(2,:)*scale, 'Autoscale', 'off' ,'color','g')
 
+%%%% make trasnformation of rerfrance triangle to physical %%%%
+q2x = zeros(2,length(q2w)); % allocate memorry
+% 3 edge points i.e triangle
+q2x = q2x + xyz(:,1)*phi1In;
+q2x = q2x + xyz(:,2)*phi2In;
+q2x = q2x + xyz(:,3)*phi3In;
+
+% Jacobian
+% jac = zeros(3);
+% 
+% jac = jac ...
+%     + [xyz(1,1)*gPhi1In(1,:)', 0; ...
+%        xyz(2,1)*gPhi1In', 0; ...
+%        xyz(3,1)*gPhi1In', 0]';
+% 
+% jac = jac ...
+%     + [xyz(1,2)*gPhi2In', 0; ...
+%        xyz(2,2)*gPhi2In', 0; ...
+%        xyz(3,2)*gPhi2In', 0]';
+% 
+% jac = jac ...
+%     + [xyz(1,3)*gPhi3In', 0; ...
+%        xyz(2,3)*gPhi3In', 0; ...
+%        xyz(3,3)*gPhi3In', 0]';
+% 
+% jac(3,3) = 1;
+
+
+
+
 sgtitle("gradiat of phi")
 
 %N
@@ -75,6 +111,7 @@ N2In = phi2In.*gPhi3In-phi3In.*gPhi2In;
 N3In = phi3In.*gPhi1In-phi1In.*gPhi3In;
 
 
+
 subplot(3,1,1)
 quiver(u,v,N1(1,:)*scale,N1(2,:)*scale,'Autoscale', 'off'), hold on
 quiver(q2u(1,:),q2u(2,:),N1In(1,:)*scale,N1In(2,:)*scale,'Autoscale', 'off')
@@ -84,6 +121,7 @@ quiver(q2u(1,:),q2u(2,:),N2In(1,:)*scale,N2In(2,:)*scale,'Autoscale', 'off')
 subplot(3,1,3)
 quiver(u,v,N3(1,:)*scale,N3(2,:)*scale,'Autoscale', 'off'), hold on
 quiver(q2u(1,:),q2u(2,:),N3In(1,:)*scale,N3In(2,:)*scale,'Autoscale', 'off')
+
 
 sgtitle("N functions")
 

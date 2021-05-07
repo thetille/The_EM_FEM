@@ -19,9 +19,9 @@ file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
             ,"waveguide_model3_flat","mesh_cylinder_R0"...
             ,"waveguide_model3_flathigh","waveguide_model3_wired"...
             ,"waveguide_model3_highHigh","waveguide_model3_flat_long"];
-vers = 3;
+vers = 8;
 load(file_list(vers))
-save_folder = 'normals4';
+save_folder = 'test3';
 
 if ~exist(sprintf('res/%s/%s',file_list(vers),save_folder), 'dir')
    mkdir(sprintf('res/%s/%s',file_list(vers),save_folder))
@@ -52,16 +52,19 @@ noIdx_all = 1:size(no2xyz,2); % each node gets an id
 edIdx_int = setdiff(edIdx_all, edIdx_pec); % removes all edges that are pec from the index
 noIdx_int = setdiff(noIdx_all, noIdx_pec); % removes all nodes that are pec from the index
 
+
+
 %varibles for port edges
 edIdx_port1_int = setdiff(edIdx_port1,edIdx_pec);
 edIdx_port2_int = setdiff(edIdx_port2,edIdx_pec);
 % Assemble global matrices
-
 %plot to show results, needs to be here in order for normals debug code to
 %work
 
-%f_list = (0.6:0.05:1.7)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
-f_list = 0.875*10^9;
+f_list = (0.6:0.005:1.7)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
+figure(3),clf, hold on
+
+%f_list = 0.837984*10^9;
 
 S_par = zeros(length(f_list),2);
 %parpool(2)
@@ -70,7 +73,7 @@ tic
 for fi = 1:length(f_list)
     f = f_list(fi);
     fprintf('frequency: %.4f GHz\n',f*10^(-9))
-    E0 = 1;
+    E0 = 10;
     w = f*2*pi;
     k0 = w*(1/c0);
     k_z10 = sqrt((k0^2)-(pi/a)^2);
@@ -92,6 +95,8 @@ for fi = 1:length(f_list)
     
     bMtx = bMtx(edIdx_int);
     BeMtx = BeMtx(edIdx_int,edIdx_int);
+    %KeMtx(edIdx_port1_int,edIdx_port1_int) = 1;
+    %KeMtx(edIdx_port2_int,edIdx_port2_int) = 0;
     KMtx = KeMtx+BeMtx;
     
 
@@ -100,13 +105,13 @@ for fi = 1:length(f_list)
     toc
 
     eFld_all = zeros(edNum_all,1); % prealocates memmory and includes edges which are PEC. PEC are zero
-    eFld_all(edIdx_int) = E;
+    eFld_all(edIdx_int) = E;%diag(BeMtx);
     %eFld_all(edIdx_int) = bMtx;
 
 
     S_par(fi,:) = S_parameters(eFld_all,fac2no_port1,fac2no_port2,no2xyz,a,b,k_z10,E0);
     
-    fprintf("S11: %f + %fi \nS12: %f + %fi \n",real(S_par(fi,1)),imag(S_par(fi,1)),real(S_par(fi,2)),imag(S_par(fi,2)))
+    fprintf("S11: %f \tS12: %f \n",abs(S_par(fi,1)),abs(S_par(fi,2)))
     
     filename = sprintf('res/%s/%s/E_filds_f_%.0f',file_list(vers),save_folder,f*10^-6);
     save(filename,'eFld_all','ed2no_boundery','no2xyz','el2no');

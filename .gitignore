@@ -28,3 +28,4 @@ octave-workspace
 
 #results
 /matlab/3D/OnlyEField_TE10/res/*
+/cst/waveguide_with_ports/*
