@@ -61,10 +61,10 @@ edIdx_port2_int = setdiff(edIdx_port2,edIdx_pec);
 %plot to show results, needs to be here in order for normals debug code to
 %work
 
-f_list = (0.6:0.005:1.7)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
+%f_list = (0.6:0.05:1.7)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
 figure(3),clf, hold on
 
-%f_list = 0.837984*10^9;
+f_list = 1.2*10^9;
 
 S_par = zeros(length(f_list),2);
 %parpool(2)
@@ -73,7 +73,7 @@ tic
 for fi = 1:length(f_list)
     f = f_list(fi);
     fprintf('frequency: %.4f GHz\n',f*10^(-9))
-    E0 = 10;
+    E0 = 1;
     w = f*2*pi;
     k0 = w*(1/c0);
     k_z10 = sqrt((k0^2)-(pi/a)^2);
@@ -111,8 +111,8 @@ for fi = 1:length(f_list)
 
     S_par(fi,:) = S_parameters(eFld_all,fac2no_port1,fac2no_port2,no2xyz,a,b,k_z10,E0);
     
-    fprintf("S11: %f \tS12: %f \n",abs(S_par(fi,1)),abs(S_par(fi,2)))
-    
+    %fprintf("S11: %f \tS12: %f \n",abs(S_par(fi,1)),abs(S_par(fi,2)))
+    fprintf("S11: %f + %fi \tS12: %f \n",real(S_par(fi,1)),imag(S_par(fi,1)),abs(S_par(fi,2)))
     filename = sprintf('res/%s/%s/E_filds_f_%.0f',file_list(vers),save_folder,f*10^-6);
     save(filename,'eFld_all','ed2no_boundery','no2xyz','el2no');
     %plot_fileds(eFld_all,ed2no_boundery,no2xyz)

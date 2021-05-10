@@ -139,10 +139,11 @@ for port = 1:length(port_list)
         int1 = int1 + ipTmp * q2w' * det_jac;
 
         %multiply each point with e10
-        magTemp = zeros(1,3);
+        magTemp = zeros(3,3);
         for point = 1:3
-           magTemp(point) = ipTmp(:,point)'*e10(:,point)*0.5; % the 0.5 is not part of the equation and it would be best if it was not there.
+           magTemp(:,point) = ipTmp(:,point).*e10(:,point);
         end
+        
         res = res + magTemp * q2w' * det_jac;
         
         test_res = test_res + (e10(2,:) * q2w' *det_jac) ;
@@ -169,7 +170,7 @@ for port = 1:length(port_list)
     %constand before integral, for both R and T
 
 
-    S_par(port) = (res);
+    S_par(port) = int1(2,:);%(res);
     port_nodes = port_list{port};
     temp = no2xyz(:,port_nodes(:));
     z_val(port) = mean(temp(3,:));
@@ -177,7 +178,6 @@ end
 
 TConstant = @(z) ( (2*exp(1j*k_z10)) / (a*b*E0) );
 RConstant = @(z) ( (2*exp(-1j*k_z10)) / (a*b*E0) );
-
-%S_par(:,1) = RConstant(z_val(1))*S_par(:,1)-exp(-2j*k_z10*z_val(1));
+%S_par(:,1) = RConstant(z_val(1))*S_par(:,1);%-exp(-2j*k_z10*z_val(1));
 %S_par(:,2) = TConstant(z_val(2))*S_par(:,2);
 

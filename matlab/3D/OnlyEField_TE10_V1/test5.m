@@ -156,6 +156,39 @@ quiver(q2x(1,:),q2x(2,:),usnn{3}(1,:)*scale,usnn{3}(2,:)*scale,'Autoscale','off'
 daspect([1 1 1])
 
 
+%%%%%% old version %%%%%%%
+
+usn_old{1} = cross(n,uin{1});
+usn_old{2} = cross(n,uin{2});
+usn_old{3} = cross(n,uin{3});
+
+for iIdx = 1:3
+    gsn_old{iIdx} = map_ccs*usn_old{iIdx};
+end
+
+figure(6)
+subplot(3,1,1), hold on
+plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
+scatter(q2x(1,:),q2x(2,:),'x')
+quiver(q2x(1,:),q2x(2,:),uin{1}(1,:)*scale,uin{1}(2,:)*scale,'Autoscale','off','color',col)
+quiver(q2x(1,:),q2x(2,:),gsn_old{1}(1,:)*scale,gsn_old{1}(2,:)*scale,'Autoscale','off')
+daspect([1 1 1])
+
+subplot(3,1,2), hold on
+plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
+scatter(q2x(1,:),q2x(2,:),'x')
+quiver(q2x(1,:),q2x(2,:),uin{2}(1,:)*scale,uin{2}(2,:)*scale,'Autoscale','off','color',col)
+quiver(q2x(1,:),q2x(2,:),gsn_old{2}(1,:)*scale,gsn_old{2}(2,:)*scale,'Autoscale','off')
+daspect([1 1 1])
+
+subplot(3,1,3),hold on
+plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
+scatter(q2x(1,:),q2x(2,:),'x')
+quiver(q2x(1,:),q2x(2,:),uin{3}(1,:)*scale,uin{3}(2,:)*scale,'Autoscale','off','color',col)
+quiver(q2x(1,:),q2x(2,:),gsn_old{3}(1,:)*scale,gsn_old{3}(2,:)*scale,'Autoscale','off')
+daspect([1 1 1])
+
+
 %b_{ij} ElMtx n x n x [j^{-1}]N * U_inc
 % %Jacobian for U_inc
 % jacU = zeros(3);
@@ -171,7 +204,7 @@ daspect([1 1 1])
 %xyz = xyz+(a/2); % (the waveguide needs to start at 0 to a
 %Area = 1/2*abs(xyz(1,1)*(xyz(2,2)-xyz(2,3))+ xyz(1,2)*(xyz(2,3)-xyz(2,1)) + xyz(1,3)*(xyz(2,1)-xyz(2,2)));
 
-% Uinc = -2j*k_z10*E0*[0,0,0;sin((pi*(q2x(1,:)+(a/2))) / a );0,0,0].*exp(-1j*k_z10*0); %needs z in exponent
+%Uinc = -2j*k_z10*E0*[0,0,0;sin((pi*(q2x(1,:)+(a/2))) / a );0,0,0].*exp(-1j*k_z10*0); %needs z in exponent
 % % scale = 0.001;
 % % quiver(q2x(1,:),q2x(2,:),Uinc(1,:),imag(Uinc(2,:)*scale),'Autoscale', 'off')
 % 

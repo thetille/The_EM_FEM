@@ -3,8 +3,8 @@ clear
 file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
 ,"waveguide_model3_flat","mesh_cylinder_R0"...
 ,"waveguide_model3_flathigh","waveguide_model3_wired"...
-,"waveguide_model3_highHigh"];
-vers = 3;
+,"waveguide_model3_highHigh","waveguide_model3_flat_long"];
+vers = 8;
 save_folder = 'test3';
 
 addpath("C:\Users\benja\Sync\AAU\10. semester\github\The_EM_FEM\matlab\3D\OnlyEField_TE10_V1")

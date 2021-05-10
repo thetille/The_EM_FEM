@@ -118,9 +118,9 @@ usnn{3} = cross(n,usn{3});
 Uinc = -2j*k_z10*E0*[0,0,0;sin((pi*(q2x(1,:)+(a/2))) / a );0,0,0].*exp(-1j*k_z10*0); %needs z in exponent
 % scale = 0.001;
 % quiver(q2x(1,:),q2x(2,:),Uinc(1,:),imag(Uinc(2,:)*scale),'Autoscale', 'off')
+%Uinc_Int = Uinc_Int + Uinc(2,:)*q2w'*det_jac;
 
 for iIdx = 1:3
     ipTmp = sum(usnn{iIdx} .* Uinc);
     bElMtx_EE(iIdx) = (ipTmp * q2w') *det_jac;
 end
-
