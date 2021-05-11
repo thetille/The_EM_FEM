@@ -56,7 +56,7 @@ for port = 1:length(port_list)
     test_res2 = 0;
     test_res3 = 0;
     test_res4 = 0;
-    figure(15+port),clf, hold on,
+    
     for no = port_list{port}
 
         xyz = no2xyz(:,no);
@@ -170,14 +170,15 @@ for port = 1:length(port_list)
     %constand before integral, for both R and T
 
 
-    S_par(port) = int1(2,:);%(res);
+    %S_par(port) = int1(2,:);
+    S_par(port) = res(2);
     port_nodes = port_list{port};
     temp = no2xyz(:,port_nodes(:));
     z_val(port) = mean(temp(3,:));
 end
 
-TConstant = @(z) ( (2*exp(1j*k_z10)) / (a*b*E0) );
-RConstant = @(z) ( (2*exp(-1j*k_z10)) / (a*b*E0) );
-%S_par(:,1) = RConstant(z_val(1))*S_par(:,1);%-exp(-2j*k_z10*z_val(1));
-%S_par(:,2) = TConstant(z_val(2))*S_par(:,2);
+TConstant = @(z) ( (2*exp(1j*k_z10*z_val(1))) / (a*b*E0) );
+RConstant = @(z) ( (2*exp(-1j*k_z10*z_val(2))) / (a*b*E0) );
+S_par(:,1) = RConstant(z_val(1))*S_par(:,1)-exp(-2j*k_z10*z_val(1));
+S_par(:,2) = TConstant(z_val(2))*S_par(:,2); % the 1/3 is a quik fix should be fixed actually ant not like this
 

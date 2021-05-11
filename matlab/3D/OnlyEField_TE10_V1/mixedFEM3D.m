@@ -1,4 +1,5 @@
 clear all
+close all
 
 global normals;
 normals = 0; %enable plotting of port normals
@@ -19,12 +20,13 @@ file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
             ,"waveguide_model3_flat","mesh_cylinder_R0"...
             ,"waveguide_model3_flathigh","waveguide_model3_wired"...
             ,"waveguide_model3_highHigh","waveguide_model3_flat_long"];
-vers = 8;
+vers = 3;
 load(file_list(vers))
-save_folder = 'test3';
+save_folder = 'test5';
 
-if ~exist(sprintf('res/%s/%s',file_list(vers),save_folder), 'dir')
-   mkdir(sprintf('res/%s/%s',file_list(vers),save_folder))
+if ~exist(sprintf('/res/%s/%s',file_list(vers),save_folder), 'dir')
+     disp('creates directory')
+    mkdir(sprintf('res/%s/%s',file_list(vers),save_folder))
 end
 
 % Initialize the FEM
@@ -44,8 +46,9 @@ edIdx_all = 1:edNum_all; % each edge gets an id
 noIdx_all = 1:size(no2xyz,2); % each node gets an id
 
 %plot stucture with ports
+ 
 % plot_edges(ed2no_port1,no2xyz,13,'r');
-% plot_edges(ed2no_port2,no2xyz,13,'r');
+% plot_edges(ed2no_port2,no2xyz,13,'g');
 % plot_edges(ed2no_pec,no2xyz,13,'g');
 
 % Compute the interior edges
@@ -61,11 +64,10 @@ edIdx_port2_int = setdiff(edIdx_port2,edIdx_pec);
 %plot to show results, needs to be here in order for normals debug code to
 %work
 
-%f_list = (0.6:0.05:1.7)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
-figure(3),clf, hold on
-
-f_list = 1.2*10^9;
-
+f_list = (0.6:0.025:1.2)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
+%f_list = 0.6*10^9;
+%f_list = 1.2*10^9;
+%
 S_par = zeros(length(f_list),2);
 %parpool(2)
 tic
@@ -73,11 +75,14 @@ tic
 for fi = 1:length(f_list)
     f = f_list(fi);
     fprintf('frequency: %.4f GHz\n',f*10^(-9))
-    E0 = 1;
+    
     w = f*2*pi;
     k0 = w*(1/c0);
     k_z10 = sqrt((k0^2)-(pi/a)^2);
+    Z = (w*(pi*4*10^(-7))/k_z10)
+    E0 = sqrt(0.5*Z)
     gamma = 1j*k_z10;
+    
 %     if (pi/a)^2 <= k0^2
 %         %k_z10 = sqrt(((pi/a).^2)-k0.^2);
 %         gamma = sqrt(((pi/a).^2)-k0.^2);
@@ -105,7 +110,7 @@ for fi = 1:length(f_list)
     toc
 
     eFld_all = zeros(edNum_all,1); % prealocates memmory and includes edges which are PEC. PEC are zero
-    eFld_all(edIdx_int) = E;%diag(BeMtx);
+    eFld_all(edIdx_int) = E;%diag(KMtx);%diag(BeMtx);
     %eFld_all(edIdx_int) = bMtx;
 
 

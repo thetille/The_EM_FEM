@@ -1,8 +1,8 @@
 clear
 close all
 a = 10;
-xyz = rand(3,3)*a;
-
+%xyz = [1,2,3.5;3,1,2;0,0,0];
+xyz = [rand(2,3)*a; 0,0,0];
 % Quadrature rule
 q2u = [[6.666666666666667e-01, ...
         1.666666666666667e-01]; ...
@@ -158,35 +158,96 @@ daspect([1 1 1])
 
 %%%%%% old version %%%%%%%
 
-usn_old{1} = cross(n,uin{1});
-usn_old{2} = cross(n,uin{2});
-usn_old{3} = cross(n,uin{3});
+% usn_old{1} = cross(n,uin{1});
+% usn_old{2} = cross(n,uin{2});
+% usn_old{3} = cross(n,uin{3});
+
+% for iIdx = 1:3
+%     gsn_old{iIdx} = map_ccs*usn_old{iIdx};
+% end
+% 
+% figure(6)
+% subplot(3,1,1), hold on
+% plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
+% scatter(q2x(1,:),q2x(2,:),'x')
+% quiver(q2x(1,:),q2x(2,:),uin{1}(1,:)*scale,uin{1}(2,:)*scale,'Autoscale','off','color',col)
+% quiver(q2x(1,:),q2x(2,:),gsn_old{1}(1,:)*scale,gsn_old{1}(2,:)*scale,'Autoscale','off')
+% daspect([1 1 1])
+% 
+% subplot(3,1,2), hold on
+% plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
+% scatter(q2x(1,:),q2x(2,:),'x')
+% quiver(q2x(1,:),q2x(2,:),uin{2}(1,:)*scale,uin{2}(2,:)*scale,'Autoscale','off','color',col)
+% quiver(q2x(1,:),q2x(2,:),gsn_old{2}(1,:)*scale,gsn_old{2}(2,:)*scale,'Autoscale','off')
+% daspect([1 1 1])
+% 
+% subplot(3,1,3),hold on
+% plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
+% scatter(q2x(1,:),q2x(2,:),'x')
+% quiver(q2x(1,:),q2x(2,:),uin{3}(1,:)*scale,uin{3}(2,:)*scale,'Autoscale','off','color',col)
+% quiver(q2x(1,:),q2x(2,:),gsn_old{3}(1,:)*scale,gsn_old{3}(2,:)*scale,'Autoscale','off')
+% daspect([1 1 1])
+
+
+figure(7)
+
+Uinc = [0,0,0;sin((pi*(q2x(1,:)))/a);0,0,0];
+UincScaled = Uinc*det_jac;
 
 for iIdx = 1:3
-    gsn_old{iIdx} = map_ccs*usn_old{iIdx};
+    ipTmp = sum(usnn{iIdx} .* UincScaled);%*det_jac;
+    bElMtx_EE(iIdx) = (ipTmp * q2w') ;
 end
-
-figure(6)
-subplot(3,1,1), hold on
+hold on
 plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
 scatter(q2x(1,:),q2x(2,:),'x')
-quiver(q2x(1,:),q2x(2,:),uin{1}(1,:)*scale,uin{1}(2,:)*scale,'Autoscale','off','color',col)
-quiver(q2x(1,:),q2x(2,:),gsn_old{1}(1,:)*scale,gsn_old{1}(2,:)*scale,'Autoscale','off')
+quiver(q2x(1,:),q2x(2,:),usnn{3}(1,:)*scale,usnn{3}(2,:)*scale,'Autoscale','off','color',col)
+quiver(q2x(1,:),q2x(2,:),Uinc(1,:)*scale,Uinc(2,:)*scale,'Autoscale','off')
+
+%quiver(q2x(1,:),q2x(2,:),usnn{3}(1,:).*ipTmp{3}*scale,usnn{3}(2,:).*ipTmp{3}*scale,'Autoscale','off')
 daspect([1 1 1])
 
-subplot(3,1,2), hold on
-plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
-scatter(q2x(1,:),q2x(2,:),'x')
-quiver(q2x(1,:),q2x(2,:),uin{2}(1,:)*scale,uin{2}(2,:)*scale,'Autoscale','off','color',col)
-quiver(q2x(1,:),q2x(2,:),gsn_old{2}(1,:)*scale,gsn_old{2}(2,:)*scale,'Autoscale','off')
-daspect([1 1 1])
 
-subplot(3,1,3),hold on
+figure(8), hold on
 plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
-scatter(q2x(1,:),q2x(2,:),'x')
-quiver(q2x(1,:),q2x(2,:),uin{3}(1,:)*scale,uin{3}(2,:)*scale,'Autoscale','off','color',col)
-quiver(q2x(1,:),q2x(2,:),gsn_old{3}(1,:)*scale,gsn_old{3}(2,:)*scale,'Autoscale','off')
-daspect([1 1 1])
+daspect([1,1,1])
+start = q2x;
+for iIdx = 1:3
+    quiver(start(1,:),start(2,:),usnn{iIdx}(1,:)*bElMtx_EE(iIdx)*scale,usnn{iIdx}(2,:).*bElMtx_EE(iIdx)*scale,'Autoscale','off')
+    start(1,:) = start(1,:) + usnn{iIdx}(1,:).*bElMtx_EE(iIdx)*scale;
+    start(2,:) = start(2,:) + usnn{iIdx}(2,:).*bElMtx_EE(iIdx)*scale;
+end
+% quiver(q2x(1,:),q2x(2,:),usnn{1}(1,:).*ipTmp{1}*scale,usnn{1}(2,:).*ipTmp{1}*scale,'Autoscale','off')
+% quiver(q2x(1,:),q2x(2,:),usnn{2}(1,:).*ipTmp{2}*scale,usnn{2}(2,:).*ipTmp{2}*scale,'Autoscale','off')
+% quiver(q2x(1,:),q2x(2,:),usnn{3}(1,:).*ipTmp{3}*scale,usnn{3}(2,:).*ipTmp{3}*scale,'Autoscale','off')
+
+
+%figure(9), hold on
+%plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
+quiver(q2x(1,:),q2x(2,:),UincScaled(1,:)*scale*(-1),UincScaled(2,:)*scale*(-1),'k','Autoscale','off')
+
+
+figure(9), hold on
+
+et = [usnn{1}(:), usnn{2}(:), usnn{3}(:)]\UincScaled(:);
+
+
+plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
+daspect([1,1,1])
+start = q2x;
+for iIdx = 1:3
+    quiver(start(1,:),start(2,:),usnn{iIdx}(1,:)*et(iIdx)*scale,usnn{iIdx}(2,:)*et(iIdx)*scale,'Autoscale','off')
+    start(1,:) = start(1,:) + usnn{iIdx}(1,:)*et(iIdx)*scale;
+    start(2,:) = start(2,:) + usnn{iIdx}(2,:)*et(iIdx)*scale;
+end
+% quiver(q2x(1,:),q2x(2,:),usnn{1}(1,:).*ipTmp{1}*scale,usnn{1}(2,:).*ipTmp{1}*scale,'Autoscale','off')
+% quiver(q2x(1,:),q2x(2,:),usnn{2}(1,:).*ipTmp{2}*scale,usnn{2}(2,:).*ipTmp{2}*scale,'Autoscale','off')
+% quiver(q2x(1,:),q2x(2,:),usnn{3}(1,:).*ipTmp{3}*scale,usnn{3}(2,:).*ipTmp{3}*scale,'Autoscale','off')
+
+
+%figure(9), hold on
+%plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
+quiver(q2x(1,:),q2x(2,:),UincScaled(1,:)*scale,UincScaled(2,:)*scale,'k','Autoscale','off')
 
 
 %b_{ij} ElMtx n x n x [j^{-1}]N * U_inc

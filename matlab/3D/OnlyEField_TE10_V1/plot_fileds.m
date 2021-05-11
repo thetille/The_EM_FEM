@@ -4,7 +4,7 @@ file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
         ,"waveguide_model3_flat","mesh_cylinder_R0"...
         ,"waveguide_model3_highres","waveguide_model3_wired"...
         ,"waveguide_model3_highHigh","waveguide_model3_flat_long"];
-vers = 8;
+vers = 3;
 save_folder = 'test3';
 f = 1.2*10^9;
 
@@ -102,7 +102,7 @@ X =  no2xyz(1,:);
 Y =  no2xyz(2,:);
 Z =  no2xyz(3,:);
 
-V = imag(exFld_all(:))+imag(eyFld_all(:))+imag(ezFld_all(:));
+V = imag(exFld_all(:))+imag(eyFld_all(:));%+imag(ezFld_all(:));
 %V = exFld_all(:).*conj(exFld_all(:))+eyFld_all(:).*conj(eyFld_all(:))+ezFld_all(:).*conj(ezFld_all(:));
 
 

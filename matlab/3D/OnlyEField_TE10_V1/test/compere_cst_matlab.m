@@ -4,8 +4,8 @@ file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
 ,"waveguide_model3_flat","mesh_cylinder_R0"...
 ,"waveguide_model3_flathigh","waveguide_model3_wired"...
 ,"waveguide_model3_highHigh","waveguide_model3_flat_long"];
-vers = 8;
-save_folder = 'test3';
+vers = 3;
+save_folder = 'test5';
 
 addpath("C:\Users\benja\Sync\AAU\10. semester\github\The_EM_FEM\matlab\3D\OnlyEField_TE10_V1")
 matlab_mesh = load(file_list(vers));
@@ -14,7 +14,7 @@ pMtx_ed2no = ProjSol2Nodes_Assemble(matlab_mesh.no2xyz, matlab_mesh.el2no);
 
 f_list = (0.6:0.05:1.5)*10^9;
 figure(1), clf
-for f = f_list(10:16)
+for f = f_list(1:10)%0.75*10^9
     sgtitle(sprintf('f: %f GHz',f*10^-9))
 
     %%%%%% loade CST data %%%%%

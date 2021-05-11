@@ -79,7 +79,7 @@ mBRes_EE = zeros(incRes_EE*elNum,1); % pre allocation for data
 
 port{1} = fac2no_port1;
 port{2} = fac2no_port2;
-direction = [-1,1];
+direction = [1,-1];
 
 for port_num = 1:2
     for no = port{port_num} % goes throug the amount of thetras
@@ -124,8 +124,7 @@ elNum = size(fac2no_port1,2);
 irRes_EE = zeros(incRes_EE*elNum,1); % pre allocation for row index 
 icRes_EE = ones(incRes_EE*elNum,1); % pre allocation for column index 
 mbRes_EE = zeros(incRes_EE*elNum,1); % pre allocation for data
-global Uinc_Int;
-Uinc_Int = 0;
+
 for no = fac2no_port1 % goes throug the amount of thetras
     
     %no = el2no(:,elIdx); % current nodes (corners / points)
@@ -152,7 +151,4 @@ for no = fac2no_port1 % goes throug the amount of thetras
     idxRes_EE = idxRes_EE + incRes_EE; % incerment pointer for edge edge
 
 end
-disp(Uinc_Int)
-%icRes_EE = ones(size(KMtx,1),1);%sparse(irRes_EE, ones(354,1), mbRes_EE, edNumGlo, edNumGlo);
-%bMtx(irRes_EE) += mbRes_EE;
 bMtx = sparse(irRes_EE, icRes_EE, mbRes_EE, edNumGlo, 1);

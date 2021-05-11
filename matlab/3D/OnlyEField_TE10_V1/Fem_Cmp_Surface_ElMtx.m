@@ -91,7 +91,7 @@ for iIdx = 1:3
     for jIdx = 1:3
         %maTmp = ones(size(q2w));
         ipTmp = sum(usn{iIdx}.* usn{jIdx});
-        BElMtx_EE(iIdx,jIdx) =  gamma* ipTmp * q2w' * det_jac;
+        BElMtx_EE(iIdx,jIdx) =  gamma* ipTmp * q2w' * det_jac * direction;
     end
 end
 
