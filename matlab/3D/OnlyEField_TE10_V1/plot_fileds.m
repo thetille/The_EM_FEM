@@ -5,7 +5,7 @@ file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
         ,"waveguide_model3_highres","waveguide_model3_wired"...
         ,"waveguide_model3_highHigh","waveguide_model3_flat_long"];
 vers = 3;
-save_folder = 'test3';
+save_folder = 'test5';
 f = 1.2*10^9;
 
 load(sprintf('res/%s/%s/Sparamters',file_list(vers),save_folder))
@@ -17,6 +17,20 @@ plot(f_list*10^(-9),abs(S_par(:,2)),'DisplayName','S12')
 title('abs')
 legend()
 %ylim([0,2])
+
+a = 0.2;
+b = 0.1;
+c0 = 299792458; % speed of light in vacuum
+w = f_list*2*pi;
+k0 = w.*(1/c0);
+k_z10 = sqrt((k0.^2)-(pi/a)^2);
+Z = (w.*(pi*4*10^(-7))./k_z10);
+E0 = sqrt(0.5.*Z);
+gamma = 1j*k_z10;
+
+T = ( (2*exp(1j.*k_z10*0.4)) ./ (a*b.*E0) );
+s_Analytic = -2.*k_z10.*E0*0.01; 
+plot(f_list*10^(-9),abs(s_Analytic*3.5))
 
 subplot(2,1,2)
 plot(f_list*10^(-9),angle(S_par(:,1)),'DisplayName','S11')

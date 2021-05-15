@@ -13,6 +13,8 @@ function [bElMtx_EE] = ...
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %global normals;
+global temp1;
+global temp2;
 normals = 0;
 
 % Quadrature rule
@@ -42,7 +44,7 @@ uin{1} = [ug{2}*up{1} - ug{1}*up{2}; 0,0,0];
 uin{2} = [ug{3}*up{2} - ug{2}*up{3}; 0,0,0];
 uin{3} = [ug{1}*up{3} - ug{3}*up{1}; 0,0,0];
 
-direction = 1;
+direction = -1;
 n = repmat([0,0,1],3,1)'*direction;
 
 if normals
@@ -85,5 +87,31 @@ usnn{2} = cross(n,usn{2});
 usnn{3} = cross(n,usn{3});
 
 Uinc = -2j*k_z10*E0*[0,0,0;sin((pi*(q2x(1,:)+(a/2))) / a );0,0,0].*exp(-1j*k_z10*0); %needs z in exponent
+% clf
+% quiver(q2x(1,:),q2x(2,:),Uinc(1,:),Uinc(2,:))
+% 
+% temp1 = temp1 + Uinc*q2w'*det(jac);
+% fprintf('Uinc: %f + %fi\n',real(temp1(2)),imag(temp1(2)))
 
-bElMtx_EE = [usnn{1}(:), usnn{2}(:), usnn{3}(:)]\Uinc(:);
+%bElMtx_EE = ([usnn{1}(:), usnn{2}(:), usnn{3}(:)]\(Uinc(:)*det(jac)))*direction;
+
+
+for iIdx = 1:3
+
+    ipTmp = sum(usnn{iIdx} .* Uinc);
+    bElMtx_EE(iIdx) = (ipTmp * q2w')*det(jac);
+end
+
+
+
+% uincsim = 0;
+% for iIdx = 1:3
+%     uincsim = uincsim + usnn{iIdx}*bElMtx_EE(iIdx);
+% end
+% hold on
+% quiver(q2x(1,:),q2x(2,:),uincsim(1,:),uincsim(2,:))
+% 
+% temp2 = temp2+ uincsim*q2w';
+% 
+% 
+% fprintf('this: %f + %fi\n',real(temp2(2)),imag(temp2(2)))

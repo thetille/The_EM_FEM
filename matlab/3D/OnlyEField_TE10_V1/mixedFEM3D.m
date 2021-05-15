@@ -64,7 +64,8 @@ edIdx_port2_int = setdiff(edIdx_port2,edIdx_pec);
 %plot to show results, needs to be here in order for normals debug code to
 %work
 
-f_list = (0.6:0.025:1.2)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
+f_list = (0.6:0.05:1.2)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
+%f_list = (0.7:0.001:0.8)*10^9;
 %f_list = 0.6*10^9;
 %f_list = 1.2*10^9;
 %
@@ -79,8 +80,8 @@ for fi = 1:length(f_list)
     w = f*2*pi;
     k0 = w*(1/c0);
     k_z10 = sqrt((k0^2)-(pi/a)^2);
-    Z = (w*(pi*4*10^(-7))/k_z10)
-    E0 = sqrt(0.5*Z)
+    Z = (w*(pi*4*10^(-7))/k_z10);
+    E0 = 15*sqrt(0.5*Z);
     gamma = 1j*k_z10;
     
 %     if (pi/a)^2 <= k0^2
@@ -128,6 +129,15 @@ plot(f_list*10^(-9),abs(S_par(:,1)),'DisplayName','S11')
 hold on
 plot(f_list*10^(-9),abs(S_par(:,2)),'DisplayName','S12')
 legend()
+
+figure(2), clf
+plot(f_list*10^(-9),angle(S_par(:,1)),'DisplayName','S11')
+hold on
+plot(f_list*10^(-9),angle(S_par(:,2)),'DisplayName','S12')
+legend()
 %ylim([0,2])
 save(sprintf('res/%s/%s/Sparamters',file_list(vers),save_folder),'S_par','f_list')
+
+
+
 

@@ -177,8 +177,7 @@ for port = 1:length(port_list)
     z_val(port) = mean(temp(3,:));
 end
 
-TConstant = @(z) ( (2*exp(1j*k_z10*z_val(1))) / (a*b*E0) );
-RConstant = @(z) ( (2*exp(-1j*k_z10*z_val(2))) / (a*b*E0) );
-S_par(:,1) = RConstant(z_val(1))*S_par(:,1)-exp(-2j*k_z10*z_val(1));
-S_par(:,2) = TConstant(z_val(2))*S_par(:,2); % the 1/3 is a quik fix should be fixed actually ant not like this
-
+TConstant = @(z) ( (2*exp(1j*k_z10*z)) / (a*b*E0) );
+RConstant = @(z) ( (2*exp(-1j*k_z10*z)) / (a*b*E0) );
+S_par(:,1) = RConstant(z_val(1))*S_par(:,1)+exp(-2j*k_z10*z_val(1));
+S_par(:,2) = TConstant(z_val(2))*S_par(:,2);

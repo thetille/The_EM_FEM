@@ -1,8 +1,8 @@
 clear
 close all
 a = 10;
-%xyz = [1,2,3.5;3,1,2;0,0,0];
-xyz = [rand(2,3)*a; 0,0,0];
+xyz = [1,2,3.5;3,1,2;0,0,0];
+%xyz = [rand(2,3)*a; 0,0,0];
 % Quadrature rule
 q2u = [[6.666666666666667e-01, ...
         1.666666666666667e-01]; ...
@@ -99,33 +99,44 @@ quiver(q2x(1,:),q2x(2,:),gsnn{3}(1,:)*scale,gsnn{3}(2,:)*scale,'Autoscale','off'
 daspect([1 1 1])
 
 n = repmat([0,0,1],3,1)';
+n2 = repmat([0,0,1],3,1)'*-1;
 %S, n x N
 usn{1} = cross(n,gsnn{1});
 usn{2} = cross(n,gsnn{2});
 usn{3} = cross(n,gsnn{3});
 
+usn2{1} = cross(n2,gsnn{1});
+usn2{2} = cross(n2,gsnn{2});
+usn2{3} = cross(n2,gsnn{3});
+
+
 col = [0.75,0.75,0.75];
+col2 = [0.90,0.60,0.90];
 
 figure(4)
-subplot(3,1,1), hold on
+sgtitle('S')
+subplot(2,3,1), hold on
 plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
 scatter(q2x(1,:),q2x(2,:),'x')
 quiver(q2x(1,:),q2x(2,:),gsnn{1}(1,:)*scale,gsnn{1}(2,:)*scale,'Autoscale','off','color',col)
 quiver(q2x(1,:),q2x(2,:),usn{1}(1,:)*scale,usn{1}(2,:)*scale,'Autoscale','off')
+quiver(q2x(1,:),q2x(2,:),usn2{1}(1,:)*scale,usn2{1}(2,:)*scale,'Autoscale','off','color',col2)
 daspect([1 1 1])
 
-subplot(3,1,2), hold on
+subplot(2,3,2), hold on
 plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
 scatter(q2x(1,:),q2x(2,:),'x')
 quiver(q2x(1,:),q2x(2,:),gsnn{2}(1,:)*scale,gsnn{2}(2,:)*scale,'Autoscale','off','color',col)
 quiver(q2x(1,:),q2x(2,:),usn{2}(1,:)*scale,usn{2}(2,:)*scale,'Autoscale','off')
+quiver(q2x(1,:),q2x(2,:),usn2{2}(1,:)*scale,usn2{2}(2,:)*scale,'Autoscale','off','color',col2)
 daspect([1 1 1])
 
-subplot(3,1,3),hold on
+subplot(2,3,3),hold on
 plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
 scatter(q2x(1,:),q2x(2,:),'x')
 quiver(q2x(1,:),q2x(2,:),gsnn{3}(1,:)*scale,gsnn{3}(2,:)*scale,'Autoscale','off','color',col)
 quiver(q2x(1,:),q2x(2,:),usn{3}(1,:)*scale,usn{3}(2,:)*scale,'Autoscale','off')
+quiver(q2x(1,:),q2x(2,:),usn2{3}(1,:)*scale,usn2{3}(2,:)*scale,'Autoscale','off','color',col2)
 daspect([1 1 1])
 
 %n x S (n x (n x S)) 
@@ -133,26 +144,34 @@ usnn{1} = cross(n,usn{1});
 usnn{2} = cross(n,usn{2});
 usnn{3} = cross(n,usn{3});
 
-figure(5)
-subplot(3,1,1), hold on
+usnn2{1} = cross(n2,usn2{1});
+usnn2{2} = cross(n2,usn2{2});
+usnn2{3} = cross(n2,usn2{3});
+
+%figure(5)
+%sgtitle('n x S')
+subplot(2,3,4), hold on
 plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
 scatter(q2x(1,:),q2x(2,:),'x')
 quiver(q2x(1,:),q2x(2,:),usn{1}(1,:)*scale,usn{1}(2,:)*scale,'Autoscale','off','color',col)
 quiver(q2x(1,:),q2x(2,:),usnn{1}(1,:)*scale,usnn{1}(2,:)*scale,'Autoscale','off')
+quiver(q2x(1,:),q2x(2,:),usnn2{1}(1,:)*scale,usnn2{1}(2,:)*scale,'--','Autoscale','off','color',col2)
 daspect([1 1 1])
 
-subplot(3,1,2), hold on
+subplot(2,3,5), hold on
 plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
 scatter(q2x(1,:),q2x(2,:),'x')
 quiver(q2x(1,:),q2x(2,:),usn{2}(1,:)*scale,usn{2}(2,:)*scale,'Autoscale','off','color',col)
 quiver(q2x(1,:),q2x(2,:),usnn{2}(1,:)*scale,usnn{2}(2,:)*scale,'Autoscale','off')
+quiver(q2x(1,:),q2x(2,:),usnn2{2}(1,:)*scale,usnn2{2}(2,:)*scale,'--','Autoscale','off','color',col2)
 daspect([1 1 1])
 
-subplot(3,1,3),hold on
+subplot(2,3,6),hold on
 plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
 scatter(q2x(1,:),q2x(2,:),'x')
 quiver(q2x(1,:),q2x(2,:),usn{3}(1,:)*scale,usn{3}(2,:)*scale,'Autoscale','off','color',col)
 quiver(q2x(1,:),q2x(2,:),usnn{3}(1,:)*scale,usnn{3}(2,:)*scale,'Autoscale','off')
+quiver(q2x(1,:),q2x(2,:),usnn2{3}(1,:)*scale,usnn2{3}(2,:)*scale,'--','Autoscale','off','color',col2)
 daspect([1 1 1])
 
 

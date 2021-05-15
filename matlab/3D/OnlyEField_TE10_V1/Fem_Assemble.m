@@ -80,6 +80,9 @@ mBRes_EE = zeros(incRes_EE*elNum,1); % pre allocation for data
 port{1} = fac2no_port1;
 port{2} = fac2no_port2;
 direction = [1,-1];
+%direction = [-1,1];
+%direction = [1,1];
+%direction = [-1,-1];
 
 for port_num = 1:2
     for no = port{port_num} % goes throug the amount of thetras
@@ -124,6 +127,12 @@ elNum = size(fac2no_port1,2);
 irRes_EE = zeros(incRes_EE*elNum,1); % pre allocation for row index 
 icRes_EE = ones(incRes_EE*elNum,1); % pre allocation for column index 
 mbRes_EE = zeros(incRes_EE*elNum,1); % pre allocation for data
+
+global temp1;
+global temp2;
+
+temp1 = zeros(3,3);
+temp2 = zeros(3,3);
 
 for no = fac2no_port1 % goes throug the amount of thetras
     

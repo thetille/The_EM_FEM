@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+
 #generate 3d points
 
 def plot_lines(ax):
@@ -71,7 +72,13 @@ for i,(w,v,u) in enumerate(zip(w_mesh,v_mesh,u_mesh)):
     #M2[i,:] = 2*(u*uhat+(v-1)*vhat+w*what)
     #M3[i,:] = 2*(u*uhat+(v-1)*vhat+w*what)
     
-    
+
+#plot tetrahedron
+fig2, ax2 = plt.subplots(1,figsize = (5,3), subplot_kw=dict(projection='3d'))
+plot_lines(ax2)
+ax2.set(xlabel='v', ylabel='u', zlabel='w')
+fig2.savefig("thtrahedron.svg")
+
 #fig = plt.figure(figsize=plt.figaspect(0.25))
 fig = plt.figure()
 ax = fig.add_subplot(2, 2, 1, projection='3d')
@@ -86,6 +93,8 @@ plot_lines(ax)
 ax = fig.add_subplot(2, 2, 4, projection='3d')
 ax.scatter(w_mesh,v_mesh,u_mesh,c = phi4)
 plot_lines(ax)
+
+
 
 fig = plt.figure()
 ax = fig.add_subplot(2, 3, 1, projection='3d')
@@ -137,6 +146,26 @@ ax.quiver(w_mesh,v_mesh,u_mesh,N6[:,0],N6[:,1],N6[:,2],mag,length=0.1,normalize=
 plot_lines(ax)
 
 
+### plot single basis function ####
+
+fig3, ax3 = plt.subplots(1,figsize = (5,3), subplot_kw=dict(projection='3d'))
+
+mag =( N1[:,0]**2+N1[:,1]**2+N1[:,2]**2 )
+mag = mag/np.max(mag)
+c = np.concatenate((mag, np.repeat(mag, 2)))
+c = plt.cm.viridis(c)
+color = ax3.quiver(w_mesh,v_mesh,u_mesh,N1[:,0],N1[:,1],N1[:,2],mag,length=0.1,normalize=True, color = c)
+
+                        
+cbaxes = fig3.add_axes([0.88, 0.1, 0.03, 0.8]) 
+fig3.colorbar(color,cax = cbaxes)
+
+plot_lines(ax3)
+ax3.set(xlabel='v', ylabel='u', zlabel='w')
+
+
+
+fig3.savefig("N_basis_function.svg")
 
 
     
