@@ -22,7 +22,7 @@ file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
             ,"waveguide_model3_highHigh","waveguide_model3_flat_long"];
 vers = 3;
 load(file_list(vers))
-save_folder = 'test5';
+save_folder = 'test1';
 
 if ~exist(sprintf('/res/%s/%s',file_list(vers),save_folder), 'dir')
      disp('creates directory')
@@ -64,7 +64,7 @@ edIdx_port2_int = setdiff(edIdx_port2,edIdx_pec);
 %plot to show results, needs to be here in order for normals debug code to
 %work
 
-f_list = (0.6:0.05:1.2)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
+f_list = (0.1:0.01:1.2)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
 %f_list = (0.7:0.001:0.8)*10^9;
 %f_list = 0.6*10^9;
 %f_list = 1.2*10^9;
@@ -81,7 +81,8 @@ for fi = 1:length(f_list)
     k0 = w*(1/c0);
     k_z10 = sqrt((k0^2)-(pi/a)^2);
     Z = (w*(pi*4*10^(-7))/k_z10);
-    E0 = 15*sqrt(0.5*Z);
+    E0 = sqrt(0.5*Z);
+    %E0 = sqrt(0.5*500);
     gamma = 1j*k_z10;
     
 %     if (pi/a)^2 <= k0^2
@@ -114,7 +115,7 @@ for fi = 1:length(f_list)
     eFld_all(edIdx_int) = E;%diag(KMtx);%diag(BeMtx);
     %eFld_all(edIdx_int) = bMtx;
 
-
+    %E0 = sqrt(0.5*Z);
     S_par(fi,:) = S_parameters(eFld_all,fac2no_port1,fac2no_port2,no2xyz,a,b,k_z10,E0);
     
     %fprintf("S11: %f \tS12: %f \n",abs(S_par(fi,1)),abs(S_par(fi,2)))
@@ -137,6 +138,12 @@ plot(f_list*10^(-9),angle(S_par(:,2)),'DisplayName','S12')
 legend()
 %ylim([0,2])
 save(sprintf('res/%s/%s/Sparamters',file_list(vers),save_folder),'S_par','f_list')
+
+figure(3), clf
+plot(f_list*10^(-9),10*log10(abs(S_par(:,1))),'DisplayName','S11')
+hold on
+plot(f_list*10^(-9),10*log10(abs(S_par(:,2))),'DisplayName','S12')
+legend()
 
 
 
