@@ -1,0 +1,17 @@
+$MeshFormat
+2.2 0 8
+$EndMeshFormat
+$PhysicalNames
+5
+2 41 "bound"
+2 42 "port1"
+2 43 "port2"
+2 44 "port3"
+3 40 "freeSpace"
+$EndPhysicalNames
+$Nodes
+0
+$EndNodes
+$Elements
+0
+$EndElements

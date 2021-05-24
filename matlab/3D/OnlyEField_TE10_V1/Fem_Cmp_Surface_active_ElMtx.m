@@ -3,7 +3,7 @@
 % numerical integration on the reference element
 % --------------------------------------------------------------
 function [bElMtx_EE] = ...
-    Fem_Cmp_Surface_ElMtx(xyz,k_z10,a,E0) % need to change from hardcode to adaptive
+    Fem_Cmp_Surface_ElMtx(xyz,k_z10,a,E0,direction) % need to change from hardcode to adaptive
 % Argument:
 %   xyz = the coordinates of the nodes of the element
 %   ma2er = material to permittivity
@@ -44,7 +44,7 @@ uin{1} = [ug{2}*up{1} - ug{1}*up{2}; 0,0,0];
 uin{2} = [ug{3}*up{2} - ug{2}*up{3}; 0,0,0];
 uin{3} = [ug{1}*up{3} - ug{3}*up{1}; 0,0,0];
 
-direction = -1;
+%direction = direction*-1;
 n = repmat([0,0,1],3,1)'*direction;
 
 if normals
@@ -86,7 +86,17 @@ usnn{1} = cross(n,usn{1});
 usnn{2} = cross(n,usn{2});
 usnn{3} = cross(n,usn{3});
 
-Uinc = -2j*k_z10*E0*[0,0,0;sin((pi*(q2x(1,:)+(a/2))) / a );0,0,0].*exp(-1j*k_z10*0); %needs z in exponent
+zval = mean(xyz(3,:));
+
+% fprintf("-2j*k_z10*E0: %f\n",-2j*k_z10*E0)
+% fprintexf("exp(-1j*k_z10*zval): %f\n",exp(-1j*k_z10*zval))
+
+Uinc = -2j*k_z10*E0*[0,0,0;sin((pi*(q2x(1,:)+(a/2))) / a );0,0,0].*exp(-1j*k_z10*zval);%*direction; %needs z in exponent
+
+plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
+quiver(q2x(1,:),q2x(2,:),abs(Uinc(1,:)),abs(Uinc(2,:)))
+
+
 % clf
 % quiver(q2x(1,:),q2x(2,:),Uinc(1,:),Uinc(2,:))
 % 

@@ -1,0 +1,15 @@
+1	-l a/2 
+2	-l -a/2 
+3	0 -a/2 
+4	middle -(a)-(devSpace/2) 
+5	middle+l -(a)-(devSpace/2) 
+6	middle+l -(devSpace/2) 
+7	middle -(devSpace/2) 
+8	middle-tia 0 
+9	middle devSpace/2 
+10	middle+l devSpace/2 
+11	middle+l (devSpace/2)+a 
+12	middle (devSpace/2)+a 
+13	0 a/2 
+14	-l a/2 
+  
