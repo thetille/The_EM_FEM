@@ -111,6 +111,10 @@ fig3.savefig("func_interp2.svg")
 ##### demonstation of hat functions ####
 
 fig4, ax4 = plt.subplots(1, figsize = (4,2))
+
+ax4.plot(sig1x,sig2,'--',color = [0.75,0.75,0.75])
+
+
 next(ax4._get_lines.prop_cycler)
 #ax4.plot(sig1x,sig2)
 ax4.plot(sig1)
@@ -124,12 +128,17 @@ ax4.set_ylim((-0.1,1.1))
 fig4.savefig("hat_demo.svg")
 
 fig5, ax5 = plt.subplots(1, figsize = (4,2))
+for i,point in enumerate(sig1):
+    ax5.plot([i,i],[0,point],'--',color = [0.75,0.75,0.75])
 ax5.plot(sig1x,sig2)
 ax5.plot(sig1,'o')
 ax5.set_title("Sampled points on function")
 ax5.set_xticks(np.arange(0,6))
 ax5.set_xticklabels(labels)
 ax5.set_ylim((-0.1,1.1))
+
+
+
 
 fig5.savefig("sampling.svg")
 

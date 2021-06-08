@@ -23,7 +23,10 @@ name = name_list[4]
 gmsh.open(name.format(".geo"))
 
 def meshSizeCallback(dim, tag, x, y, z):
-    return 0.075 #- 0.35*x
+    return 0.0065 #- 0.35*x
+
+plot = False
+
 
 gmsh.model.mesh.setSizeCallback(meshSizeCallback)
 
@@ -144,21 +147,23 @@ for entei in enteisesForGroupe[groupidx][:]:
     nodes = gmsh.model.mesh.getElements(dim = groups[groupidx][0], tag = entei)[2]
     fac2no_bound = np.concatenate((fac2no_bound,np.reshape(nodes,(-1,3))))
 
-fig = plt.figure()
-ax = fig.add_subplot(211, projection='3d')
-# for nodes in fac2no_port1:
-#     xyz = no2xyz[nodes-1]
-#     ax.scatter(xyz[:,0],xyz[:,1],xyz[:,2])
-    
-#ax = fig.add_subplot(211, projection='3d')   
-# for nodes in fac2no_port2:
-#     xyz = no2xyz[nodes-1]
-#     ax.scatter(xyz[:,0],xyz[:,1],xyz[:,2])
-    
-ax = fig.add_subplot(212, projection='3d')   
-for nodes in fac2no_bound:
-    xyz = no2xyz[nodes-1]
-    ax.scatter(xyz[:,0],xyz[:,1],xyz[:,2])
+if plot:
+
+    fig = plt.figure()
+    ax = fig.add_subplot(211, projection='3d')
+    # for nodes in fac2no_port1:
+    #     xyz = no2xyz[nodes-1]
+    #     ax.scatter(xyz[:,0],xyz[:,1],xyz[:,2])
+        
+    #ax = fig.add_subplot(211, projection='3d')   
+    # for nodes in fac2no_port2:
+    #     xyz = no2xyz[nodes-1]
+    #     ax.scatter(xyz[:,0],xyz[:,1],xyz[:,2])
+        
+    ax = fig.add_subplot(212, projection='3d')   
+    for nodes in fac2no_bound:
+        xyz = no2xyz[nodes-1]
+        ax.scatter(xyz[:,0],xyz[:,1],xyz[:,2])
     
 ################ find pec edges #########################
 ed2no_port = np.empty(len(port_list), dtype=object)
@@ -173,40 +178,40 @@ ed2no_pec = np.sort(ed2no_pec, axis = -1)
 ed2no_pec = np.unique(ed2no_pec,axis = 0)
 
 
+if plot:
+    ax = a3.Axes3D(plt.figure())
+    ax.set_xlim(np.min(no2xyz[:,0]),np.max(no2xyz[:,0]))
+    ax.set_ylim(np.min(no2xyz[:,1]),np.max(no2xyz[:,1]))
+    ax.set_zlim(np.min(no2xyz[:,2]),np.max(no2xyz[:,2]))
+    
+    for j,port in enumerate(port_list):
+        for i in range(ed2no_port[j].shape[1]):
+            nodes = ed2no_port[j][:,i]
+            vtx = no2xyz[nodes-1];
+            tri = a3.art3d.Poly3DCollection([vtx])
+            #tri.set_color(colors.rgb2hex(np.random.rand(3)))
+            tri.set_edgecolor("red")
+            ax.add_collection3d(tri)
+    plt.show()
 
-ax = a3.Axes3D(plt.figure())
-ax.set_xlim(np.min(no2xyz[:,0]),np.max(no2xyz[:,0]))
-ax.set_ylim(np.min(no2xyz[:,1]),np.max(no2xyz[:,1]))
-ax.set_zlim(np.min(no2xyz[:,2]),np.max(no2xyz[:,2]))
 
-for j,port in enumerate(port_list):
-    for i in range(ed2no_port[j].shape[1]):
-        nodes = ed2no_port[j][:,i]
+    # for i in range(len(ed2no_port2)):
+    #     nodes = ed2no_port2[i,:]
+    #     vtx = no2xyz[nodes-1];
+    #     tri = a3.art3d.Poly3DCollection([vtx])
+    #     #tri.set_color(colors.rgb2hex(np.random.rand(3)))
+    #     tri.set_edgecolor("red")
+    #     ax.add_collection3d(tri)
+    # plt.show()
+
+    for i in range(len(ed2no_pec)):
+        nodes = ed2no_pec[i,:].T
         vtx = no2xyz[nodes-1];
         tri = a3.art3d.Poly3DCollection([vtx])
         #tri.set_color(colors.rgb2hex(np.random.rand(3)))
-        tri.set_edgecolor("red")
+        tri.set_edgecolor("green")
         ax.add_collection3d(tri)
-plt.show()
-
-
-# for i in range(len(ed2no_port2)):
-#     nodes = ed2no_port2[i,:]
-#     vtx = no2xyz[nodes-1];
-#     tri = a3.art3d.Poly3DCollection([vtx])
-#     #tri.set_color(colors.rgb2hex(np.random.rand(3)))
-#     tri.set_edgecolor("red")
-#     ax.add_collection3d(tri)
-# plt.show()
-
-for i in range(len(ed2no_pec)):
-    nodes = ed2no_pec[i,:].T
-    vtx = no2xyz[nodes-1];
-    tri = a3.art3d.Poly3DCollection([vtx])
-    #tri.set_color(colors.rgb2hex(np.random.rand(3)))
-    tri.set_edgecolor("green")
-    ax.add_collection3d(tri)
-plt.show()
+    plt.show()
 
 #ed2no_bound = np.concatenate((ed2no_port1,ed2no_port2,ed2no_pec))
 # ed2no_pec = np.sort(ed2no_pec, axis = -1)
@@ -225,7 +230,7 @@ fa2no_all = fa2no_all.astype('float64')
 
 mdic = {"ed2no_pec": ed2no_pec.T, "ed2no_port":ed2no_port, "no2xyz": no2xyz.T, "el2no": el2no.T, "el2ma": el2ma, "ed2no_all": ed2no_all.T, "fa2no_all": fa2no_all.T,"port_fac2no_list": fac2no_port}
 
-io.savemat(name.format(".mat"), mdic)
+io.savemat(name.format("10.mat"), mdic)
 
 # fig = plt.figure()
 # ax = fig.add_subplot(111, projection='3d')

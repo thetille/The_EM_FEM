@@ -95,7 +95,8 @@ mxMtx_NE = sparse(irRes_NE, icRes_NE, mxRes_NE, noNumGlo, edNumGlo); %put result
 myMtx_NE = sparse(irRes_NE, icRes_NE, myRes_NE, noNumGlo, edNumGlo); %put result into sparce matrix
 mzMtx_NE = sparse(irRes_NE, icRes_NE, mzRes_NE, noNumGlo, edNumGlo); %put result into sparce matrix
 
-isMtx = diag(1./diag(msMtx_NN)); %invers serult of node to node
+isMtx = 1./diag(msMtx_NN);
+isMtx = sparse(1:length(isMtx),1:length(isMtx),isMtx); %invers serult of node to node
 
 proj_ed2noMtx.xc = isMtx*mxMtx_NE; 
 proj_ed2noMtx.yc = isMtx*myMtx_NE;

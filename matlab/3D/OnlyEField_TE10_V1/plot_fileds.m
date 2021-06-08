@@ -49,6 +49,7 @@ E0 = sqrt(0.5.*Z);
 gamma = 1j*k_z10;
 
 
+
 figure(3), clf;
 filename = sprintf('res/%s/%s/E_filds_%d_f_%.0f',file_list(vers),save_folder,port_i,f*10^-6);
 %filename = 'res/test_save_bMtx';

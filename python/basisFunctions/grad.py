@@ -79,6 +79,21 @@ plot_lines(ax2)
 ax2.set(xlabel='v', ylabel='u', zlabel='w')
 fig2.savefig("thtrahedron.svg")
 
+#plot tetrahedron
+fig2, ax2 = plt.subplots(1,figsize = (5,3), subplot_kw=dict(projection='3d'))
+plot_lines(ax2)
+q2u = np.array([[5.854101966249685e-01, 1.381966011250105e-01, 1.381966011250105e-01],
+       [1.381966011250105e-01, 5.854101966249685e-01, 1.381966011250105e-01],
+       [1.381966011250105e-01, 1.381966011250105e-01, 5.854101966249685e-01],
+       [1.381966011250105e-01,1.381966011250105e-01, 1.381966011250105e-01]])
+    
+ax2.plot( q2u[:,0], q2u[:,1],'go', zs = q2u[:,2])
+ax2.set(xlabel='v', ylabel='u', zlabel='w')
+fig2.savefig("thtrahedron_int_points.svg")
+ax2.view_init(elev=90, azim=0)
+fig2.savefig("thtrahedron_int_points2.svg")
+ax2.view_init(elev=0, azim=90)
+fig2.savefig("thtrahedron_int_points3.svg")
 #fig = plt.figure(figsize=plt.figaspect(0.25))
 fig = plt.figure()
 ax = fig.add_subplot(2, 2, 1, projection='3d')

@@ -1,6 +1,10 @@
 clear all
 close all
 
+set(0, 'DefaultTextInterpreter', 'none')
+set(0, 'DefaultLegendInterpreter', 'none')
+set(0, 'DefaultAxesTickLabelInterpreter', 'none')
+
 % Direct or sparse eigenvalue solver for small and large
 % problems, respectively [solver = 'direct' or 'sparse']
 
@@ -18,12 +22,12 @@ ma2si = {@(x,y,z) 0};%0.1*exp(-((x+0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
 
 % Read mesh
 file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
-            ,"waveguide_model3_flat","mesh_cylinder_R0"...
+            ,"waveguide_model3_flat7","mesh_cylinder_R0"...
             ,"waveguide_model3_flathigh","waveguide_model3_wired"...
             ,"waveguide_model3_highHigh","waveguide_model3_flat_long"...
             ,"waveguide_with_3_ports"];
 vers = 3;
-load(file_list(vers))
+load(sprintf('mesh_test/%s',file_list(vers)))
 save_folder = 'test1';
 
 if ~exist(sprintf('/res/%s/%s',file_list(vers),save_folder), 'dir')
@@ -57,7 +61,8 @@ edIdx_int = setdiff(edIdx_all, edIdx_pec); % removes all edges that are pec from
 noIdx_int = setdiff(noIdx_all, noIdx_pec); % removes all nodes that are pec from the index
 
 
-f_list = (0.1:0.1:1.2)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
+%f_list = (0.1:0.15:1.45)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
+f_list = (0.1:0.025:1.5)*10^9;
 %f_list = (0.7:0.001:0.8)*10^9;
 %f_list = 0.6*10^9;
 %f_list = (13:0.25:15)*10^9;
@@ -69,10 +74,10 @@ tic
 %f_list = f_list(10:16);
 listIdx = circshift(1:length(port_fac2no_list),-1);
 
-direction = direction(listIdx);
-port_fac2no_list = port_fac2no_list(listIdx);
-for port_i = 2:length(port_fac2no_list)
+
+for port_i = 1:1%length(port_fac2no_list)
     for fi = 1:length(f_list)
+        tic
         f = f_list(fi);
         fprintf('frequency: %.4f GHz\n',f*10^(-9))
 
@@ -82,7 +87,6 @@ for port_i = 2:length(port_fac2no_list)
         Z = (w*(pi*4*10^(-7))/k_z10);
         E0 = sqrt(0.5*Z);
         gamma = 1j*k_z10;
-
         figure(10), hold on;
         [KeMtx, BeMtx, bMtx] = ...
             Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2si, port_fac2no_list, k0, gamma, k_z10, a, E0, direction);
@@ -93,11 +97,8 @@ for port_i = 2:length(port_fac2no_list)
         BeMtx = BeMtx(edIdx_int,edIdx_int);
         KMtx = KeMtx+BeMtx;
 
-
-        tic
         E = KMtx\bMtx;
-        toc
-
+        
         eFld_all = zeros(edNum_all,1); % prealocates memmory and includes edges which are PEC. PEC are zero
         eFld_all(edIdx_int) = E;
 
@@ -107,89 +108,35 @@ for port_i = 2:length(port_fac2no_list)
         filename = sprintf('res/%s/%s/E_filds_%d_f_%.0f',file_list(vers),save_folder,port_i,f*10^-6);
         %save(filename,'eFld_all','ed2no_boundery','no2xyz','el2no');
         save(filename,'eFld_all','ed2no_pec','ed2no_port','no2xyz','el2no');
+        toc
     end
     direction = direction(listIdx);
     port_fac2no_list = port_fac2no_list(listIdx);
 end
-toc
-figure(1), clf
-plot(f_list*10^(-9),abs(S_par(:,1,1)),'DisplayName','S11')
-hold on
-plot(f_list*10^(-9),abs(S_par(:,2,1)),'DisplayName','S21')
-plot(f_list*10^(-9),abs(S_par(:,1,2)),'DisplayName','S22')
-plot(f_list*10^(-9),abs(S_par(:,2,2)),'DisplayName','S12')
 
-w = f_list*2*pi;
-k0 = w.*(1./c0);
-k_z10 = sqrt((k0.^2)-(pi./a).^2);
-Z = (w.*(pi.*4.*10^(-7))./k_z10);
-E0 = sqrt(0.5.*Z);
-gamma = 1j.*k_z10;
+save(sprintf('res/%s/%s/Sparamters',file_list(vers),save_folder),'S_par','f_list')
 
-%RR = exp(-2j*k_z10*0.4);
-RR = E0*a*b.*exp(-1j*k_z10*0.4)./2;
-
-plot(f_list*10^(-9),abs(RR),'DisplayName','RR')
-
-legend()
-
-figure(2), clf
+figure(4), clf
 subplot(2,1,1)
-plot(f_list*10^(-9),real(S_par(:,1,1)),'DisplayName','S11')
+plot(f_list*10^(-9),10*log10(abs(S_par(:,1,1))),'DisplayName','S11')
 hold on
-plot(f_list*10^(-9),real(S_par(:,2,1)),'DisplayName','S21')
-plot(f_list*10^(-9),real(S_par(:,1,2)),'DisplayName','S22')
-plot(f_list*10^(-9),real(S_par(:,2,2)),'DisplayName','S12')
-plot(f_list*10^(-9),real(RR),'DisplayName','RR')
+plot(f_list*10^(-9),10*log10(abs(S_par(:,2,1))),'DisplayName','S21')
+xlabel('Freqency [GHz]')
+ylabel('dB')
+lg = legend();
+lg.Location = 'northwest';
+ylim([-60,1])
 
-legend()
 subplot(2,1,2)
-plot(f_list*10^(-9),imag(S_par(:,1,1)),'DisplayName','S11')
+plot(f_list*10^(-9),(angle(S_par(:,1,1)))*180/pi,'DisplayName','S11')
 hold on
-plot(f_list*10^(-9),imag(S_par(:,2,1)),'DisplayName','S21')
-plot(f_list*10^(-9),imag(S_par(:,1,2)),'DisplayName','S22')
-plot(f_list*10^(-9),imag(S_par(:,2,2)),'DisplayName','S12')
-plot(f_list*10^(-9),imag(RR),'DisplayName','RR')
+plot(f_list*10^(-9),(angle(S_par(:,2,1)))*180/pi,'DisplayName','S21')
+xlabel('Freqency [GHz]')
+ylabel('Phase [$\degree$]')
+set(gcf,'Position',[100 100 600 600]);
 
-legend()
 
-% 
-% figure(2), clf
-% plot(f_list*10^(-9),angle(S_par(:,1,1)),'DisplayName','S11')
-% hold on
-% plot(f_list*10^(-9),angle(S_par(:,2,1)),'DisplayName','S12')
-% plot(f_list*10^(-9),angle(S_par(:,1,2)),'DisplayName','S22')
-% plot(f_list*10^(-9),angle(S_par(:,2,1)),'DisplayName','S12')
-% legend()
-% %ylim([0,2])
-% save(sprintf('res/%s/%s/Sparamters',file_list(vers),save_folder),'S_par','f_list')
-% 
-% figure(3), clf
-% plot(f_list*10^(-9),10*log10(abs(S_par(:,1,1))),'DisplayName','S11')
-% hold on
-% plot(f_list*10^(-9),10*log10(abs(S_par(:,2,1))),'DisplayName','S21')
-% %plot(f_list*10^(-9),10*log10(abs(S_par(:,3,1))),'DisplayName','S31')
-% %plot(f_list*10^(-9),10*log10(abs(S_par(:,1,2))),'DisplayName','S22') % not woriking
-% %plot(f_list*10^(-9),10*log10(abs(S_par(:,2,2))),'DisplayName','S12') 
-% %plot(f_list*10^(-9),10*log10(abs(S_par(:,3,2))),'DisplayName','S12') %not working
-% %plot(f_list*10^(-9),10*log10(abs(S_par(:,1,3))),'DisplayName','S33') % not working same as S22
-% %plot(f_list*10^(-9),10*log10(abs(S_par(:,2,3))),'DisplayName','S13') % not working same as S12
-% %plot(f_list*10^(-9),10*log10(abs(S_par(:,3,3))),'DisplayName','S23')
-% legend()
-% 
-% figure(4), clf
-% plot(f_list*10^(-9),10*log10(abs(S_par(:,1,1))),'DisplayName','S11')
-% hold on
-% plot(f_list*10^(-9),10*log10(abs(S_par(:,2,1))),'DisplayName','S21')
-% %plot(f_list*10^(-9),10*log10(abs(S_par(:,3,1))),'DisplayName','S31')
-% plot(f_list*10^(-9),10*log10(abs(S_par(:,1,2))),'DisplayName','S22') % not woriking
-% plot(f_list*10^(-9),10*log10(abs(S_par(:,2,2))),'DisplayName','S12') 
-% %plot(f_list*10^(-9),10*log10(abs(S_par(:,3,2))),'DisplayName','S12') %not working
-% %plot(f_list*10^(-9),10*log10(abs(S_par(:,1,3))),'DisplayName','S33') % not working same as S22
-% %plot(f_list*10^(-9),10*log10(abs(S_par(:,2,3))),'DisplayName','S13') % not working same as S12
-% %plot(f_list*10^(-9),10*log10(abs(S_par(:,3,3))),'DisplayName','S23')
-% legend()
-
+saveas(gcf,'res/Sparameters_our_FEM','svg')
 
 
 
