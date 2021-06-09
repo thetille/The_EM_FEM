@@ -13,7 +13,7 @@ Our_FEM_color = cols(3,:);
 
 CST_FEM = load('waveguide_with_ports');
 CST_FIT = load('waveguide_with_ports_FIT');
-Our_FEM = load('../3D/OnlyEField_TE10_V1/res/waveguide_model3_flat7/test1/Sparamters');
+Our_FEM = load('../3D/OnlyEField_TE10_V1/res/waveguide_model3_flat6/test1/Sparamters');
 
 S21 = [];
 ana_f = (0.1:0.005:1.5)*10^9;
@@ -100,7 +100,7 @@ saveas(gcf,'Sparameters_compear_S12','svg')
 
 figure(3),clf,hold on
 start = 464;
-start2 = 26;
+start2 = 1;
 plot(CST_FEM.f(start:end),unwrap(CST_FEM.S12_Phase(start:end)*pi/180)*180/pi,'DisplayName','CST FEM S21','color',CST_FEM_color)
 plot(CST_FIT.f(start:end),unwrap(CST_FIT.S12_phase(start:end)*pi/180)*180/pi,'DisplayName','CST FIT S21','color',CST_FIT_color)
 plot(Our_FEM.f_list(start2:end)*10^-9,unwrap(angle(Our_FEM.S_par(start2:end,2,1)))*180/pi,'DisplayName','Our FEM S21 True','color',[0.8,0.8,0.8])

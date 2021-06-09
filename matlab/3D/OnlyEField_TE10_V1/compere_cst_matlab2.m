@@ -6,7 +6,7 @@ set(0, 'DefaultLegendInterpreter', 'none')
 set(0, 'DefaultAxesTickLabelInterpreter', 'none')
 
 file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
-,"waveguide_model3_flat7","mesh_cylinder_R0"...
+,"waveguide_model3_flat6","mesh_cylinder_R0"...
 ,"waveguide_model3_flathigh","waveguide_model3_wired"...
 ,"waveguide_model3_highHigh","waveguide_model3_flat_long"];
 vers = 3;
@@ -50,20 +50,34 @@ for f = f_list%0.75*10^9
     kc = sqrt(((m*pi/a)^2)+((n*pi/b)^2));
     k = omega*sqrt(mu*eps);
     be = sqrt((k^2) - (kc^2));
+%     if kc^2 >= k^2
+%         be = 1j*sqrt((k^2) - (kc^2));
+%         disp('1j*sqrt((k^2) - (kc^2))')
+%     else
+%         be = sqrt(((kc^2) - k^2));
+%         disp('sqrt(((kc^2) - k^2))')
+%     end
+    if kc^2 <= k^2
+        be = sqrt((k^2) - (kc^2));
+        disp('1j*sqrt((k^2) - (kc^2))')
+    else
+        be = -sqrt((k^2) - (kc^2));
+        disp('sqrt(((kc^2) - k^2))')
+    end
+    
     
 %     eta = sqrt(mu/eps);
 %     Z = ((k*eta)/be);
 %     E0 = sqrt(0.5*Z);
     
     A = (sqrt(2)*pi)/((a^(2/3))*sqrt(b)*sqrt(mu)*sqrt(omega)*sqrt(be));
-    
     %(omega*mu*(a^3)*(A^2)*b)/(
     
     x = 0.05; %the anlytical has the (0,0,0) point at the center inted of the middle
     y = 0.025; %the anlytical has the (0,0,0) point at the center inted of the middle
     z = 0:res:0.4;    
-    Ex_ana = 1i*(( 1j*omega*mu*n*pi)/((kc^2)*b)) *A* cos((m*pi*x)/a) * sin((n*pi*y)/b) * exp(1j*be.*z);
-    Ey_ana = 1i*((-1j*omega*mu*m*pi)/((kc^2)*a)) *A* sin((m*pi*x)/a) * cos((n*pi*y)/b) * exp(1j*be.*z);
+    Ex_ana = 1j*(( 1j*omega*mu*n*pi)/((kc^2)*b)) *A* cos((m*pi*x)/a) * sin((n*pi*y)/b) * exp(-1j*be.*z);
+    Ey_ana = 1j*((-1j*omega*mu*m*pi)/((kc^2)*a)) *A* sin((m*pi*x)/a) * cos((n*pi*y)/b) * exp(-1j*be.*z);
     Ez_ana = zeros(size(Ey_ana));
     
     
@@ -145,7 +159,7 @@ for f = f_list%0.75*10^9
     matlab_EzPhase = griddata(matlab_data.no2xyz(1,:),matlab_data.no2xyz(2,:),matlab_data.no2xyz(3,:),angle(ezFld_all*(-1i)),Xq,Yq,Zq);
     
     
-    %figure(1+figure_offset)
+    figure(1)
     ax = subplot(3,2,1); hold on
     plot(z,abs(Ey_ana),'DisplayName',sprintf('f: %.2f GHz',f*10^-9))
     title('Ey Analytical')
@@ -182,6 +196,43 @@ for f = f_list%0.75*10^9
     max4 = max([max4 matlab_EyAbs]);
     min4 = min([min4 matlab_EyAbs]);
     ylim([min4,max4])
+    ylabel('E-Field [V/m]')
+    
+    lh =legend(ax,'Location','SouthOutside');%'Orientation','Horizontal');
+    lh.FontSize = 11.5;
+    
+    set(gcf,'Position',[100 100 700 460])
+    
+    figure(2)
+    ax = subplot(3,2,1); hold on
+    plot(z,angle(Ey_ana),'DisplayName',sprintf('f: %.2f GHz',f*10^-9))
+    title('Ey Analytical')
+    %max1 = max([max1 angle(Ey_ana)]);
+    %min1 = min([min1 angle(Ey_ana)]);
+    %ylim([min1,max1])
+    xlabel('Z cordinate [m]')
+    ylabel('E-Field [V/m]')
+    
+    ax = subplot(3,2,2); hold on
+    plot(CSTz,CST_Eyphase,'DisplayName',sprintf('f: %.2f GHz',f*10^-9))
+    title('CST FEM')
+    %max2 = max([max2 CST_Eyabs']);
+    %min2 = min([min2 CST_Eyabs']);
+    %ylim([min2,max2])
+    xlabel('Z cordinate [m]')
+    ylabel('E-Field [V/m]')
+    
+    ax = subplot(3,2,3); hold on
+    title('CST FIT')
+    plot(CSTz_fit,CST_Eyphase_fit,'DisplayName',sprintf('f: %.2f GHz',f*10^-9))
+    xlabel('Z cordinate [m]')
+    ylabel('E-Field [V/m]')
+    ylabel('E-Field [V/m]')
+    
+    ax = subplot(3,2,4); hold on
+    title('Our FEM')
+    plot(Zq,matlab_EyPhase,'DisplayName',sprintf('f: %.2f GHz',f*10^-9))
+    xlabel('Z cordinate [m]')
     ylabel('E-Field [V/m]')
     
     lh =legend(ax,'Location','SouthOutside');%'Orientation','Horizontal');

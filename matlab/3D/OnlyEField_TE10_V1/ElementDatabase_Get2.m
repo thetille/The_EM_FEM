@@ -50,17 +50,8 @@ for dimIdx = 2:length(size_DB)
     jmpTmp = jmpTmp*size_DB(dimIdx);
 end
 
-% Find indices of the data
-
-v = intersect(htk_DB,htk_ipt);
-bmin = ismember(output_min,v);
-bmax = ismember(output_max,v);
-imin = find(bmin);
-imax = find(bmax);
-
-
-% [~, idx_DB, idx_ipt] = intersect(htk_DB, htk_ipt);
-% [~, idx_sort] = sort(idx_ipt);
+[~, idx_DB, idx_ipt] = intersect(htk_DB, htk_ipt);
+[~, idx_sort] = sort(idx_ipt);
 
 idx_ipt = idx_ipt(idx_sort);
 idx_DB = idx_DB(idx_sort)';
