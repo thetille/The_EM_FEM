@@ -50,11 +50,16 @@ for dimIdx = 2:length(size_DB)
     jmpTmp = jmpTmp*size_DB(dimIdx);
 end
 
-[~, idx_DB, idx_ipt] = intersect(htk_DB, htk_ipt);
-[~, idx_sort] = sort(idx_ipt);
+%[~, idx_DB2, idx_ipt2] = intersect(htk_DB, htk_ipt);
+% find the indexes of the intersect
 
-idx_ipt = idx_ipt(idx_sort);
-idx_DB = idx_DB(idx_sort)';
+[~,idx_DB] = ismember(htk_ipt,htk_DB);
+%[dd2,idx_ipt2] = ismember(htk_DB,htk_ipt);
+
+% [~, idx_sort] = sort(idx_ipt);
+% 
+% idx_ipt = idx_ipt(idx_sort);
+% idx_DB = idx_DB(idx_sort)';
 
 % ------------------------------------------------------------------
 % Sanity check (Adds about 10% execution time...)

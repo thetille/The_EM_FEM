@@ -29,7 +29,7 @@ file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
             ,"waveguide_with_3_ports"];
 vers = 3;
 load(sprintf('mesh_test/%s',file_list(vers)))
-save_folder = 'test2';
+save_folder = 'test1';
 
 if ~exist(sprintf('/res/%s/%s',file_list(vers),save_folder), 'dir')
      disp('creates directory')
@@ -63,9 +63,9 @@ noIdx_int = setdiff(noIdx_all, noIdx_pec); % removes all nodes that are pec from
 
 
 %f_list = (0.1:0.15:1.45)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
-f_list = (0.25:0.05:1.5)*10^9;
+%f_list = (0.25:0.05:1.5)*10^9;
 %f_list = (0.7:0.001:0.8)*10^9;
-%f_list = 0.6*10^9;
+f_list = 0.6*10^9;
 %f_list = (13:0.25:15)*10^9;
 %f_list = 1.2*10^9;
 %
