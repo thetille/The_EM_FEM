@@ -34,6 +34,19 @@ irRes_EE = zeros(incRes_EE*elNumGlo,1); % pre allocation for row index
 icRes_EE = zeros(incRes_EE*elNumGlo,1); % pre allocation for column index 
 mKRes_EE = zeros(incRes_EE*elNumGlo,1); % pre allocation for data
 
+
+noTmp = zeros([size(ed2noLoc,1),elNumGlo*size(ed2noLoc,2)]);
+noTmpTmp = zeros(size(ed2noLoc));
+pointer = 1;
+for elIdx = 1:elNumGlo
+  noTmpTmp(:) = el2no(ed2noLoc(:),elIdx);
+  noTmp(:,pointer:pointer+5) = noTmpTmp;
+  pointer = pointer+size(ed2noLoc,2);
+end
+eiVtr_list = ElementDatabase_Get2('edges', noTmp) ; 
+
+pointer = 1;
+
 for elIdx = 1:elNumGlo % goes throug the amount of thetras
     
     no = el2no(:,elIdx); % current nodes (corners / points)
@@ -45,8 +58,10 @@ for elIdx = 1:elNumGlo % goes throug the amount of thetras
     noTmp = zeros(size(ed2noLoc)); % temp var of size of the amount of initial base lines (edges) 
     noTmp(:) = el2no(ed2noLoc(:),elIdx); % temp var with initial base edge nodes (one edge has 2 nodes ie 6x2)
     esVtr = sign(noTmp(2,:)-noTmp(1,:)); % each edge gest an assigned direction based on node id (this is random)is only used as initial value
-    eiVtr = ElementDatabase_Get('edges', noTmp); % each edge id assosiated with the specific thetra (6 edges)
-
+    %eiVtr = ElementDatabase_Get('edges', noTmp); % each edge id assosiated with the specific thetra (6 edges)
+    eiVtr = eiVtr_list(pointer:pointer+5);
+    
+    
     % edges only
     irTmp_EE = eiVtr'*ones(size(eiVtr)); % row index for eMtx only based on edge id
     icTmp_EE = ones(size(eiVtr'))*eiVtr; % column index for eMtx only based on edge id
@@ -59,7 +74,7 @@ for elIdx = 1:elNumGlo % goes throug the amount of thetras
 
     
     idxRes_EE = idxRes_EE + incRes_EE; % incerment pointer for edge edge
-
+    pointer = pointer+6;
 end
 
 KMtx = sparse(irRes_EE, icRes_EE, mKRes_EE, edNumGlo, edNumGlo);

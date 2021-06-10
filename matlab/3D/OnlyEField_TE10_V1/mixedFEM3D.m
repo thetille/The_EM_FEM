@@ -63,6 +63,7 @@ noIdx_int = setdiff(noIdx_all, noIdx_pec); % removes all nodes that are pec from
 
 
 %f_list = (0.1:0.15:1.45)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
+
 f_list = (0.25:0.1:1.5)*10^9;
 %f_list = (0.7:0.001:0.8)*10^9;
 %f_list = 0.6*10^9;
