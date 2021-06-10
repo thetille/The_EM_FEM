@@ -13,7 +13,7 @@ Our_FEM_color = cols(3,:);
 
 CST_FEM = load('waveguide_with_ports');
 CST_FIT = load('waveguide_with_ports_FIT');
-Our_FEM = load('../3D/OnlyEField_TE10_V1/res/waveguide_model3_flat6/test1/Sparamters');
+Our_FEM = load('../3D/OnlyEField_TE10_V1/res/waveguide_model3_flat6/test2/Sparamters');
 
 S21 = [];
 ana_f = (0.1:0.005:1.5)*10^9;

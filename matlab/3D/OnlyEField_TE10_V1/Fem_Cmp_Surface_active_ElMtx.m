@@ -91,7 +91,7 @@ zval = mean(xyz(3,:));
 % fprintf("-2j*k_z10*E0: %f\n",-2j*k_z10*E0)
 % fprintexf("exp(-1j*k_z10*zval): %f\n",exp(-1j*k_z10*zval))
 
-Uinc = -2j*k_z10*E0*[0,0,0;sin((pi*(q2x(1,:)+(a/2))) / a );0,0,0].*exp(-1j*k_z10*zval);%*direction; %needs z in exponent
+Uinc = -2j*k_z10*E0*[0,0,0;sin((pi*(q2x(1,:)+(a/2))) / a );0,0,0];%.*exp(-1j*k_z10*zval);%*direction; %needs z in exponent
 
 % plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
 % quiver(q2x(1,:),q2x(2,:),abs(Uinc(1,:)),abs(Uinc(2,:)))

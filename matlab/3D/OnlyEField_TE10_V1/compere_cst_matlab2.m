@@ -6,12 +6,12 @@ set(0, 'DefaultLegendInterpreter', 'none')
 set(0, 'DefaultAxesTickLabelInterpreter', 'none')
 
 file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
-,"waveguide_model3_flat6","mesh_cylinder_R0"...
+,"waveguide_model3_flat5","mesh_cylinder_R0"...
 ,"waveguide_model3_flathigh","waveguide_model3_wired"...
 ,"waveguide_model3_highHigh","waveguide_model3_flat_long"];
 vers = 3;
 save_folder = 'test1';
-port_i = 1;
+port_i = 2;
 
 matlab_mesh = load(file_list(vers));
 Fem_Init(matlab_mesh.no2xyz, matlab_mesh.ed2no_all, matlab_mesh.fa2no_all);
