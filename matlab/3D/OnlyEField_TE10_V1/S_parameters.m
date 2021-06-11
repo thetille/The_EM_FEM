@@ -1,5 +1,5 @@
 function [S_par] = ...
-    S_parameters(E,port_fac2no_list,no2xyz,a,b,k_z10,E0) % need to change from hardcode to adaptive
+    S_parameters(E,port_fac2no_list,no2xyz,a,b,E0) % need to change from hardcode to adaptive
 
 % ed2no_port1
 % fac2no_port1
@@ -103,5 +103,5 @@ end
 
 TConstant = @(z) ( (2) / (a*b*E0) );
 RConstant = @(z) ( (2) / (a*b*E0) );
-S_par(:,1) = RConstant(z_val(1))*S_par(:,1);%+exp(-2j*k_z10*z_val(1));
+S_par(:,1) = RConstant(z_val(1))*S_par(:,1)+1;
 S_par(:,2) = TConstant(z_val(2))*S_par(:,2);

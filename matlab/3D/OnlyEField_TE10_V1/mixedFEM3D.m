@@ -27,9 +27,9 @@ file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
             ,"waveguide_model3_flathigh","waveguide_model3_wired"...
             ,"waveguide_model3_highHigh","waveguide_model3_flat_long"...
             ,"waveguide_with_3_ports","waveguide_flat_rod10"];
-vers = 10;
+vers = 3;
 load(sprintf('%s',file_list(vers)))
-save_folder = 'test1';
+save_folder = 'test2';
 
 if ~exist(sprintf('/res/%s/%s',file_list(vers),save_folder), 'dir')
      disp('creates directory')
@@ -64,7 +64,7 @@ noIdx_int = setdiff(noIdx_all, noIdx_pec); % removes all nodes that are pec from
 
 %f_list = (0.1:0.15:1.45)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
 
-f_list = (0.25:0.025:1.5)*10^9;
+f_list = (0.25:0.035:1.5)*10^9;
 %f_list = (0.25:0.30:1.45)*10^9;
 %f_list = 1.2*10^9;
 %
@@ -75,7 +75,15 @@ tic
 
 listIdx = circshift(1:length(port_fac2no_list),-1);
 
+
+% Materials
+ma2er = {@(x,y,z) 1};% + 4*exp(-((x-0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
+ma2mu = {@(x,y,z) 1};%0.1*exp(-((x+0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
+[KeMtx1,KeMtx2] = Assemble_K(no2xyz, el2no, el2ma, ma2er, ma2mu);
+
 for port_i = 1:length(port_fac2no_list)
+    BeMtx1 = Assemble_B(no2xyz,port_fac2no_list, direction);
+    bMtx1  = Assemble_smallb(no2xyz, port_fac2no_list,a,direction);
     for fi = 1:length(f_list)
         tic
         f = f_list(fi);
@@ -95,13 +103,12 @@ for port_i = 1:length(port_fac2no_list)
         E0 = sqrt(input_power*Z);
         gamma = 1j*k_z10;
         
-        % Materials
-        ma2er = {@(x,y,z) 1 - 1i*(sigma1/(w*ep0)), @(x,y,z) 1};% + 4*exp(-((x-0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
-        ma2mu = {@(x,y,z) 1, @(x,y,z) 1};%0.1*exp(-((x+0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
-        
         figure(3), hold on
-        [KeMtx, BeMtx, bMtx] = ...
-            Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2mu, port_fac2no_list, k0, gamma, k_z10, a, E0, direction);
+        
+        
+        KeMtx = KeMtx1 - (k0^2)*KeMtx2;
+        BeMtx = gamma*BeMtx1;
+        bMtx = k_z10*E0*bMtx1;
 
         KeMtx = KeMtx(edIdx_int,edIdx_int);
 

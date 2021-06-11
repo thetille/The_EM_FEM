@@ -3,7 +3,7 @@
 % numerical integration on the reference element
 % --------------------------------------------------------------
 function [bElMtx_EE] = ...
-    Fem_Cmp_Surface_ElMtx(xyz,k_z10,a,E0,direction) % need to change from hardcode to adaptive
+    Fem_Cmp_Surface_ElMtx(xyz,a,direction) % need to change from hardcode to adaptive
 % Argument:
 %   xyz = the coordinates of the nodes of the element
 %   ma2er = material to permittivity
@@ -12,9 +12,6 @@ function [bElMtx_EE] = ...
 %
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 2D %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%global normals;
-global temp1;
-global temp2;
 normals = 0;
 
 % Quadrature rule
@@ -89,7 +86,7 @@ usnn{3} = cross(n,usn{3});
 zval = mean(xyz(3,:));
 
 
-Uinc = -2j*k_z10*E0*[0,0,0;sin((pi*(q2x(1,:)+(a/2))) / a );0,0,0];%.*exp(-1j*k_z10*zval);%*direction; %needs z in exponent
+Uinc = -2j*[0,0,0;sin((pi*(q2x(1,:)+(a/2))) / a );0,0,0];%.*exp(-1j*k_z10*zval);%*direction; %needs z in exponent
 
 for iIdx = 1:3
 

@@ -3,7 +3,7 @@
 % numerical integration on the reference element
 % --------------------------------------------------------------
 function [BElMtx_EE] = ...
-    Fem_Cmp_Surface_ElMtx(xyz,gamma,direction) % need to change from hardcode to adaptive
+    Fem_Cmp_Surface_ElMtx(xyz,direction) % need to change from hardcode to adaptive
 % Argument:
 %   xyz = the coordinates of the nodes of the element
 %   ma2er = material to permittivity
@@ -91,7 +91,7 @@ for iIdx = 1:3
     for jIdx = 1:3
         %maTmp = ones(size(q2w));
         ipTmp = sum(usn{iIdx}.* usn{jIdx});
-        BElMtx_EE(iIdx,jIdx) =  gamma* ipTmp * q2w' * det_jac;
+        BElMtx_EE(iIdx,jIdx) =  ipTmp * q2w' * det_jac;
     end
 end
 BElMtx_EE = BElMtx_EE*direction;

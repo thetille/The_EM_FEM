@@ -2,8 +2,8 @@
 % Compute element matrices for the tetrahedron by means of
 % numerical integration on the reference element
 % --------------------------------------------------------------
-function [KElMtx_EE] = ...
-    Fem_Cmp_Vol_ElMtx(xyz, ma2er, ma2mu, k0)
+function [KElMtx_EE1,KElMtx_EE2] = ...
+    Fem_Cmp_Vol_ElMtx(xyz, ma2er, ma2mu)
 
 % Argument:
 %   xyz = the coordinates of the nodes of the element
@@ -93,7 +93,9 @@ for iIdx = 1:6
     for jIdx = 1:6
         mu = ma2mu(q2x(1,:),q2x(2,:),q2x(3,:));
         er = ma2er(q2x(1,:),q2x(2,:),q2x(3,:));
-        ipTmp = (1./mu).*sum(gcn{iIdx}.*gcn{jIdx} - (k0^2)*er.*gin{iIdx}.* gin{jIdx});
-        KElMtx_EE(iIdx,jIdx) = ipTmp * q2w' * det_jac;
+        ipTmp1 = (1./mu).*sum(gcn{iIdx}.*gcn{jIdx});
+        ipTmp2 = sum(er.*gin{iIdx}.* gin{jIdx});
+        KElMtx_EE1(iIdx,jIdx) = ipTmp1 * q2w' * det_jac;
+        KElMtx_EE2(iIdx,jIdx) = ipTmp2 * q2w' * det_jac;
     end
 end
