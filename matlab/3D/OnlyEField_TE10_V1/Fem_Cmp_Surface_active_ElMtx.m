@@ -88,23 +88,8 @@ usnn{3} = cross(n,usn{3});
 
 zval = mean(xyz(3,:));
 
-% fprintf("-2j*k_z10*E0: %f\n",-2j*k_z10*E0)
-% fprintexf("exp(-1j*k_z10*zval): %f\n",exp(-1j*k_z10*zval))
 
 Uinc = -2j*k_z10*E0*[0,0,0;sin((pi*(q2x(1,:)+(a/2))) / a );0,0,0];%.*exp(-1j*k_z10*zval);%*direction; %needs z in exponent
-
-% plot([xyz(1,:),xyz(1,1)],[xyz(2,:),xyz(2,1)])
-% quiver(q2x(1,:),q2x(2,:),abs(Uinc(1,:)),abs(Uinc(2,:)))
-
-
-% clf
-% quiver(q2x(1,:),q2x(2,:),Uinc(1,:),Uinc(2,:))
-% 
-% temp1 = temp1 + Uinc*q2w'*det(jac);
-% fprintf('Uinc: %f + %fi\n',real(temp1(2)),imag(temp1(2)))
-
-%bElMtx_EE = ([usnn{1}(:), usnn{2}(:), usnn{3}(:)]\(Uinc(:)*det(jac)))*direction;
-
 
 for iIdx = 1:3
 

@@ -13,7 +13,8 @@ Our_FEM_color = cols(3,:);
 
 CST_FEM = load('waveguide_with_ports');
 CST_FIT = load('waveguide_with_ports_FIT');
-Our_FEM = load('../3D/OnlyEField_TE10_V1/res/waveguide_model3_flat6/test2/Sparamters');
+Our_FEM = load('../3D/OnlyEField_TE10_V1/res/waveguide_model3_flat6/test1/Sparamters');
+port = 2;
 
 S21 = [];
 ana_f = (0.1:0.005:1.5)*10^9;
@@ -41,7 +42,7 @@ ax = nexttile;
 hold on
 plot(CST_FEM.f,10*log10(CST_FEM.S12_Mag),'DisplayName','CST FEM S11','color',CST_FEM_color)
 plot(CST_FIT.f,10*log10(CST_FIT.S11_Mag),'DisplayName','CST FIT S11','color',CST_FIT_color)
-plot(Our_FEM.f_list*10^-9,10*log10(abs(Our_FEM.S_par(:,1,1))),'DisplayName','Our FEM S11','color',Our_FEM_color)
+plot(Our_FEM.f_list*10^-9,10*log10(abs(Our_FEM.S_par(:,1,port))),'DisplayName','Our FEM S11','color',Our_FEM_color)
 plot([0.74948, 0.74948],[-80,0],'--','color',[0.5,0.5,0.5],'DisplayName','Cut off frequency')
 
 set(ax, 'XTick', 0:0.15:1.5)
@@ -59,7 +60,7 @@ lh.FontSize = 11.5;
 ax = nexttile; hold on
 plot(CST_FEM.f,CST_FEM.S11_Phase,'DisplayName','CST FEM S11','color',CST_FEM_color)
 plot(CST_FIT.f,CST_FIT.S11_Phase,'DisplayName','CST FIT S11','color',CST_FIT_color)
-plot(Our_FEM.f_list*10^-9,angle(Our_FEM.S_par(:,1,1))*180/pi,'DisplayName','Our FEM S11','color',Our_FEM_color)
+plot(Our_FEM.f_list*10^-9,angle(Our_FEM.S_par(:,1,port))*180/pi,'DisplayName','Our FEM S11','color',Our_FEM_color)
 xlabel('Freqency [GHz]')
 ylabel('Phase [$\degree$]')
 plot([0.74948, 0.74948],[-180,180],'--','color',[0.5,0.5,0.5],'DisplayName','Cut off frequency')
@@ -74,7 +75,7 @@ t = tiledlayout(2,1);
 ax = nexttile; hold on
 plot(CST_FEM.f,10*log10(CST_FEM.S11_Mag),'DisplayName','CST FEM S21','color',CST_FEM_color)
 plot(CST_FIT.f,10*log10(CST_FIT.S12_Mag),'DisplayName','CST FIT S21','color',CST_FIT_color)
-plot(Our_FEM.f_list*10^-9,10*log10(abs(Our_FEM.S_par(:,2,1))),'DisplayName','Our FEM S21','color',Our_FEM_color)
+plot(Our_FEM.f_list*10^-9,10*log10(abs(Our_FEM.S_par(:,2,port))),'DisplayName','Our FEM S21','color',Our_FEM_color)
 plot(ana_f*10^-9,10*log10(abs(S21)),'DisplayName','Analytical S21')
 plot([0.74948, 0.74948],[-80,0],'--','color',[0.5,0.5,0.5],'DisplayName','Cut off frequency')
 set(ax, 'XTick', 0:0.15:1.5)
@@ -88,7 +89,7 @@ lh.FontSize = 11.5;
 ax = nexttile; hold on
 plot(CST_FIT.f,CST_FIT.S12_phase,'DisplayName','CST FIT S12','color',CST_FIT_color)
 plot(CST_FEM.f,CST_FEM.S12_Phase,'DisplayName','CST FEM S12','color',CST_FEM_color)
-plot(Our_FEM.f_list*10^-9,angle(Our_FEM.S_par(:,2,1))*180/pi,'DisplayName','Our FEM S21','color',Our_FEM_color)
+plot(Our_FEM.f_list*10^-9,angle(Our_FEM.S_par(:,2,port))*180/pi,'DisplayName','Our FEM S21','color',Our_FEM_color)
 %plot(ana_f*10^-9,angle(S21),'DisplayName','Analytical S21')
 set(ax, 'XTick', 0:0.15:1.5)
 plot([0.74948, 0.74948],[-180,180],'--','color',[0.5,0.5,0.5],'DisplayName','Cut off frequency')
@@ -103,8 +104,8 @@ start = 464;
 start2 = 1;
 plot(CST_FEM.f(start:end),unwrap(CST_FEM.S12_Phase(start:end)*pi/180)*180/pi,'DisplayName','CST FEM S21','color',CST_FEM_color)
 plot(CST_FIT.f(start:end),unwrap(CST_FIT.S12_phase(start:end)*pi/180)*180/pi,'DisplayName','CST FIT S21','color',CST_FIT_color)
-plot(Our_FEM.f_list(start2:end)*10^-9,unwrap(angle(Our_FEM.S_par(start2:end,2,1)))*180/pi,'DisplayName','Our FEM S21 True','color',[0.8,0.8,0.8])
-plot(Our_FEM.f_list(start2:end)*10^-9,-1*unwrap(angle(Our_FEM.S_par(start2:end,2,1)))*180/pi,'DisplayName','Our FEM S21 Flipped','color',Our_FEM_color)
+plot(Our_FEM.f_list(start2:end)*10^-9,unwrap(angle(Our_FEM.S_par(start2:end,2,port)))*180/pi,'DisplayName','Our FEM S21 True','color',[0.8,0.8,0.8])
+plot(Our_FEM.f_list(start2:end)*10^-9,-1*unwrap(angle(Our_FEM.S_par(start2:end,2,port)))*180/pi,'DisplayName','Our FEM S21 Flipped','color',Our_FEM_color)
 plot([0.74948, 0.74948],[-180,180],'--','color',[0.5,0.5,0.5],'DisplayName','Cut off frequency')
 lh = legend();
 lh.FontSize = 11.5;
@@ -121,7 +122,7 @@ start2 = 27;
 figure(4), clf, hold on
 plot(CST_FEM.f(start3:end),10*log10(CST_FEM.S11_Mag(start3:end)),'DisplayName','CST FEM S21','color',CST_FEM_color)
 plot(CST_FIT.f(start:end),10*log10(CST_FIT.S12_Mag(start:end)),'DisplayName','CST FIT S21','color',CST_FIT_color)
-plot(Our_FEM.f_list(start2:end)*10^-9,10*log10(abs(Our_FEM.S_par((start2:end),2,1))),'DisplayName','Our FEM S21','color',Our_FEM_color)
+plot(Our_FEM.f_list(start2:end)*10^-9,10*log10(abs(Our_FEM.S_par((start2:end),2,port))),'DisplayName','Our FEM S21','color',Our_FEM_color)
 %plot(ana_f*10^-9,10*log10(abs(S21)),'DisplayName','Analytical S21')
 %plot([0.74948, 0.74948],[-80,0],'--','color',[0.5,0.5,0.5],'DisplayName','Cut off frequency')
 set(ax, 'XTick', 0:0.15:1.5)
@@ -134,7 +135,7 @@ lh =legend(ax,'Location','NorthOutside','Orientation','Horizontal');
 lh.FontSize = 11.5;
 legend()
 
-out_FEM_new = interp1(Our_FEM.f_list*10^-9,abs(Our_FEM.S_par(:,2,1)),CST_FIT.f);
+out_FEM_new = interp1(Our_FEM.f_list*10^-9,abs(Our_FEM.S_par(:,2,port)),CST_FIT.f);
 CST_FEM_new = interp1(CST_FEM.f,CST_FEM.S11_Mag,CST_FIT.f);
 pass_at = 465;
 

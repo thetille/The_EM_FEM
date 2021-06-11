@@ -2,7 +2,7 @@
 % Assemble the global matrices
 % --------------------------------------------------------------
 function [KMtx, BMtx, bMtx] = ...
-    Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2si, port_fac2no_list, k0, gamma, k_z10, a, E0, direction)
+    Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2mu, port_fac2no_list, k0, gamma, k_z10, a, E0, direction)
 
 % Arguments:
 %   no2xyz = coordinates of the nodes
@@ -53,7 +53,7 @@ for elIdx = 1:elNumGlo % goes throug the amount of thetras
     xyz = no2xyz(:,no); % coordinates for the nodes (4 nodes)
     
     [KElMtx_EE] = ...
-        Fem_Cmp_Vol_ElMtx(xyz, ma2er{el2ma(elIdx)}, ma2si{el2ma(elIdx)},k0);
+        Fem_Cmp_Vol_ElMtx(xyz, ma2er{el2ma(elIdx)}, ma2mu{el2ma(elIdx)},k0);
     %for edges
     noTmp = zeros(size(ed2noLoc)); % temp var of size of the amount of initial base lines (edges) 
     noTmp(:) = el2no(ed2noLoc(:),elIdx); % temp var with initial base edge nodes (one edge has 2 nodes ie 6x2)

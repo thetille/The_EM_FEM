@@ -9,26 +9,26 @@ set(0, 'DefaultAxesTickLabelInterpreter', 'none')
 % problems, respectively [solver = 'direct' or 'sparse']
 
 direction = [1,-1];
-a = 0.2;
-b = 0.1;
-c0 = 299792458; % speed of light in vacuum
-input_power = 0.5;
 mu0 = (4*pi)*1e-7;
 ep0 =  8.854e-12;
 
 
-% Materials
-ma2er = {@(x,y,z) 1};% + 4*exp(-((x-0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
-ma2si = {@(x,y,z) 0};%0.1*exp(-((x+0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
+a = 0.2;
+b = 0.1;
+c0 = 299792458; % speed of light in vacuum
+input_power = 0.5;
+sigma1 = 1.04e7;
+
+
 
 % Read mesh
 file_list = ["cylinder_waveguide2", "waveguide_model3 - simple"...
             ,"waveguide_model3_flat6","mesh_cylinder_R0"...
             ,"waveguide_model3_flathigh","waveguide_model3_wired"...
             ,"waveguide_model3_highHigh","waveguide_model3_flat_long"...
-            ,"waveguide_with_3_ports"];
-vers = 3;
-load(sprintf('mesh_test/%s',file_list(vers)))
+            ,"waveguide_with_3_ports","waveguide_flat_rod10"];
+vers = 10;
+load(sprintf('%s',file_list(vers)))
 save_folder = 'test1';
 
 if ~exist(sprintf('/res/%s/%s',file_list(vers),save_folder), 'dir')
@@ -64,10 +64,8 @@ noIdx_int = setdiff(noIdx_all, noIdx_pec); % removes all nodes that are pec from
 
 %f_list = (0.1:0.15:1.45)*10^9;%[0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1]*10^9;
 
-f_list = (0.25:0.1:1.5)*10^9;
-%f_list = (0.7:0.001:0.8)*10^9;
-%f_list = 0.6*10^9;
-%f_list = (13:0.25:15)*10^9;
+f_list = (0.25:0.025:1.5)*10^9;
+%f_list = (0.25:0.30:1.45)*10^9;
 %f_list = 1.2*10^9;
 %
 S_par = zeros(length(f_list),length(port_fac2no_list),length(port_fac2no_list));
@@ -88,18 +86,22 @@ for port_i = 1:length(port_fac2no_list)
         k_z10 = sqrt( (k0^2)-(pi/a)^2);
         
         if (pi/a)^2 <= k0^2
-            k_z10 = -1*direction(1)*sqrt( (k0^2)-(pi/a)^2);
+            k_z10 = -1*sqrt( (k0^2)-(pi/a)^2);
         else
-            k_z10 = direction(1)*sqrt( (k0^2)-(pi/a)^2);
+            k_z10 = sqrt( (k0^2)-(pi/a)^2);
         end
         
         Z = (w*(pi*mu0)/k_z10);
         E0 = sqrt(input_power*Z);
         gamma = 1j*k_z10;
         
+        % Materials
+        ma2er = {@(x,y,z) 1 - 1i*(sigma1/(w*ep0)), @(x,y,z) 1};% + 4*exp(-((x-0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
+        ma2mu = {@(x,y,z) 1, @(x,y,z) 1};%0.1*exp(-((x+0.125).^2+y.^2+(z-0.3).^2)/(0.1^2))};
+        
         figure(3), hold on
         [KeMtx, BeMtx, bMtx] = ...
-            Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2si, port_fac2no_list, k0, gamma, k_z10, a, E0, direction);
+            Fem_Assemble(no2xyz, el2no, el2ma, ma2er, ma2mu, port_fac2no_list, k0, gamma, k_z10, a, E0, direction);
 
         KeMtx = KeMtx(edIdx_int,edIdx_int);
 

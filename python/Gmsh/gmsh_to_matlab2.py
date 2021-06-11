@@ -6,7 +6,6 @@ Created on Wed Mar 17 14:12:14 2021
 """
 import gmsh
 import sys
-import math
 import numpy as np
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d as a3
@@ -18,12 +17,12 @@ import scipy.io as io
 
 gmsh.initialize(sys.argv)
 
-name_list = ["cylinder_waveguide{}","waveguide_model2{}","waveguide_model3{}","waveguide_model3 - simple{}","waveguide_model3_flat{}","waveguide_model3_flat_long{}","waveguide_with_3_ports{}"]
-name = name_list[4]
+name_list = ["waveguide_flat_rod{}","waveguide_model2{}","waveguide_model3{}","waveguide_model3 - simple{}","waveguide_model3_flat{}","waveguide_model3_flat_long{}","waveguide_with_3_ports{}"]
+name = name_list[0]
 gmsh.open(name.format(".geo"))
 
 def meshSizeCallback(dim, tag, x, y, z):
-    return 0.0065 #- 0.35*x
+    return 0.03 #- 0.35*x
 
 plot = False
 
@@ -34,21 +33,21 @@ gmsh.option.setNumber("Mesh.MeshSizeExtendFromBoundary", 0)
 gmsh.option.setNumber("Mesh.MeshSizeFromPoints", 0)
 gmsh.option.setNumber("Mesh.MeshSizeFromCurvature", 0)
 
-
-
 gmsh.model.mesh.generate(3)
 
 groups = gmsh.model.getPhysicalGroups(dim=-1)
 
 groups_name = []
 for group in groups:
-    groups_name.append(gmsh.model.getPhysicalName(dim = group[0], tag=group[1]))
+    groups_name.append(gmsh.model.getPhysicalName(dim = group[0], tag=group[1])) 
 
 enteisesForGroupe = []
 for group in groups:
     enteisesForGroupe.append(gmsh.model.getEntitiesForPhysicalGroup(group[0],group[1]))
 
-no2xyz = np.reshape(gmsh.model.mesh.getNodes(dim = -1, tag=-1)[1],(-1,3))
+temp =gmsh.model.mesh.getNodes(dim = -1, tag=-1)
+no2xyz = np.zeros((temp[0].size,3))
+no2xyz[temp[0]-1,:] =  np.reshape(temp[1],(-1,3))
 
 if np.size(no2xyz,0) != np.size(np.unique(no2xyz,axis = 0),0):
     raise Exception("Sorry, repeats") 
@@ -75,24 +74,6 @@ fa2no_all = np.sort(fa2no_all, axis=-1)
 fa2no_all = np.unique(fa2no_all,axis = 0)
 
 
-
-# ax = a3.Axes3D(plt.figure())
-# ax.set_xlim(np.min(no2xyz[:,0]),np.max(no2xyz[:,0]))
-# ax.set_ylim(np.min(no2xyz[:,1]),np.max(no2xyz[:,1]))
-# ax.set_zlim(np.min(no2xyz[:,2]),np.max(no2xyz[:,2]))
-
-
-# for i in range(len(fa2no_all)):
-#     nodes = fa2no_all[i,:]
-#     vtx = no2xyz[nodes-1];
-#     tri = a3.art3d.Poly3DCollection([vtx])
-#     tri.set_color(colors.rgb2hex(np.random.rand(3)))
-#     tri.set_edgecolor('k')
-#     ax.add_collection3d(tri)
-#     plt.show()
-#     plt.pause(0.01)
-
-
 ################ find all edges #########################
 ed2no_all = np.zeros((len(el2no)*6,2), dtype=np.int64)
 
@@ -113,22 +94,8 @@ for element2no in el2no:
     
 ed2no_all = np.sort(ed2no_all, axis=-1)
 ed2no_all = np.unique(ed2no_all,axis = 0)
-    
-# ax = a3.Axes3D(plt.figure())
-# ax.set_xlim(np.min(no2xyz[:,0]),np.max(no2xyz[:,0]))
-# ax.set_ylim(np.min(no2xyz[:,1]),np.max(no2xyz[:,1]))
-# ax.set_zlim(np.min(no2xyz[:,2]),np.max(no2xyz[:,2]))
 
-# for i in range(len(ed2no_all)):
-#     nodes = ed2no_all[i,:]
-#     vtx = no2xyz[nodes-1];
-#     tri = a3.art3d.Poly3DCollection([vtx])
-#     #tri.set_color(colors.rgb2hex(np.random.rand(3)))
-#     tri.set_edgecolor(colors.rgb2hex(np.random.rand(3)))
-#     ax.add_collection3d(tri)
-# plt.show()
-
-################ find pec faces #########################
+################ find pec and port faces #########################
 port_list = []
 for i,group_name in enumerate(groups_name):
     if group_name.startswith('port'):
@@ -141,7 +108,7 @@ for i,port in enumerate(port_list):
     fac2no_port_temp = np.reshape(fac2no_port_temp[2],(-1,3))
     fac2no_port[i] = fac2no_port_temp.T
 
-groupidx = groups_name.index('bound')
+groupidx = groups_name.index('pec')
 fac2no_bound = np.empty((0,3),dtype = np.uint64)
 for entei in enteisesForGroupe[groupidx][:]:
     nodes = gmsh.model.mesh.getElements(dim = groups[groupidx][0], tag = entei)[2]
@@ -150,22 +117,12 @@ for entei in enteisesForGroupe[groupidx][:]:
 if plot:
 
     fig = plt.figure()
-    ax = fig.add_subplot(211, projection='3d')
-    # for nodes in fac2no_port1:
-    #     xyz = no2xyz[nodes-1]
-    #     ax.scatter(xyz[:,0],xyz[:,1],xyz[:,2])
-        
-    #ax = fig.add_subplot(211, projection='3d')   
-    # for nodes in fac2no_port2:
-    #     xyz = no2xyz[nodes-1]
-    #     ax.scatter(xyz[:,0],xyz[:,1],xyz[:,2])
-        
-    ax = fig.add_subplot(212, projection='3d')   
+    ax = fig.add_subplot(111, projection='3d')   
     for nodes in fac2no_bound:
         xyz = no2xyz[nodes-1]
         ax.scatter(xyz[:,0],xyz[:,1],xyz[:,2])
     
-################ find pec edges #########################
+################ find port and pec edges #########################
 ed2no_port = np.empty(len(port_list), dtype=object)
 for i,port in enumerate(port_list):
     ed2no_port_temp = np.concatenate((fac2no_port[i][[0,1],:].T,fac2no_port[i][[1,2],:].T,fac2no_port[i][[0,2],:].T))
@@ -177,8 +134,32 @@ ed2no_pec = np.concatenate((fac2no_bound[:,[0,1]],fac2no_bound[:,[1,2]],fac2no_b
 ed2no_pec = np.sort(ed2no_pec, axis = -1)
 ed2no_pec = np.unique(ed2no_pec,axis = 0)
 
+################ find volume materials #########################
+
+el2ma = np.zeros(len(el2no),dtype = np.int64)*-1;
+for i,volume in enumerate((3,4)):
+    elInMa = (gmsh.model.mesh.getElements(dim = groups[volume][0], tag = enteisesForGroupe[volume][0]))
+    #fac2no_port_temp =  np.array(fac2no_port_temp, dtype=object)
+    for k,el in enumerate(elInMa[1][0]):
+        el2ma[np.where(ellements[1][0] == el)] = i+1
+        
+np.where(el2ma == 0)
+
 
 if plot:
+    
+    # ax = a3.Axes3D(plt.figure())
+    # ax.set_xlim(np.min(no2xyz[:,0]),np.max(no2xyz[:,0]))
+    # ax.set_ylim(np.min(no2xyz[:,1]),np.max(no2xyz[:,1]))
+    # ax.set_zlim(np.min(no2xyz[:,2]),np.max(no2xyz[:,2]))
+    
+    # for tri in fac2no_port[0].T:
+    #     nodes = no2xyz[tri-1]
+    #     ax.plot(np.append(nodes[:,0],nodes[1,0]),np.append(nodes[:,1],nodes[0,1]),np.append(nodes[:,2],nodes[0,2]))
+    
+    
+    
+    
     ax = a3.Axes3D(plt.figure())
     ax.set_xlim(np.min(no2xyz[:,0]),np.max(no2xyz[:,0]))
     ax.set_ylim(np.min(no2xyz[:,1]),np.max(no2xyz[:,1]))
@@ -192,17 +173,6 @@ if plot:
             #tri.set_color(colors.rgb2hex(np.random.rand(3)))
             tri.set_edgecolor("red")
             ax.add_collection3d(tri)
-    plt.show()
-
-
-    # for i in range(len(ed2no_port2)):
-    #     nodes = ed2no_port2[i,:]
-    #     vtx = no2xyz[nodes-1];
-    #     tri = a3.art3d.Poly3DCollection([vtx])
-    #     #tri.set_color(colors.rgb2hex(np.random.rand(3)))
-    #     tri.set_edgecolor("red")
-    #     ax.add_collection3d(tri)
-    # plt.show()
 
     for i in range(len(ed2no_pec)):
         nodes = ed2no_pec[i,:].T
@@ -212,94 +182,19 @@ if plot:
         tri.set_edgecolor("green")
         ax.add_collection3d(tri)
     plt.show()
+    
+    fig = plt.figure()
+    colors = ((1,0,0),(0,1,0))
+    ax = fig.add_subplot(111, projection='3d')   
+    for i,nodes in enumerate(el2no):
+        xyz = no2xyz[nodes-1]
+        ax.scatter(np.mean(xyz[:,0]),np.mean(xyz[:,1]),np.mean(xyz[:,2]),color = colors[el2ma[i]-1])
 
-#ed2no_bound = np.concatenate((ed2no_port1,ed2no_port2,ed2no_pec))
-# ed2no_pec = np.sort(ed2no_pec, axis = -1)
-#ed2no_pec = np.unique(ed2no_pec,axis = 0)
-
-el2ma = np.ones((1,len(el2no)))
 
 el2no = el2no.astype('float64') 
-# ed2no_port1 = ed2no_port1.astype('float64') 
-# ed2no_port2 = ed2no_port2.astype('float64') 
 ed2no_pec = ed2no_pec.astype('float64') 
 fa2no_all = fa2no_all.astype('float64')
-#ed2no_pec = ed2no_pec.astype('float64')
-
-# mdic = {"no2xyz": no2xyz.T, "el2no": el2no.T, "el2ma": el2ma, "ed2no_all": ed2no_all.T, "ed2no_port1": ed2no_port1.T, "ed2no_port2": ed2no_port2.T, "ed2no_bound": ed2no_bound.T, "fa2no_all": fa2no_all.T, "ed2no_pec": ed2no_pec.T, "fac2no_port1": fac2no_port1.T, "fac2no_port2": fac2no_port2.T}
 
 mdic = {"ed2no_pec": ed2no_pec.T, "ed2no_port":ed2no_port, "no2xyz": no2xyz.T, "el2no": el2no.T, "el2ma": el2ma, "ed2no_all": ed2no_all.T, "fa2no_all": fa2no_all.T,"port_fac2no_list": fac2no_port}
 
 io.savemat(name.format("10.mat"), mdic)
-
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-# ax.scatter(no2xyz[:,0],no2xyz[:,1],no2xyz[:,2])
-
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-
-# nodes = ed2no_all[2]
-# nodes = np.unique(nodes)
-# xyz = no2xyz[nodes-1]
-# ax.scatter(xyz[:,0],xyz[:,1],xyz[:,2])
-
-
-
-
-
-
-
-
-
-
-# dim = 2
-# port12elle = np.empty((0,dim+1),dtype = 'int64')
-# for entities in enteisesForGroupe[0]:
-#     nodes = (np.reshape(gmsh.model.mesh.getElements(dim = dim, tag = entities)[2],(-1,dim+1)))
-#     port12elle = np.concatenate((port12elle ,nodes),axis = 0)
-
-# # ax3 = fig.add_subplot(3,1,3, projection='3d')
-# corrd = np.empty((0,3))
-# for ellement in port12elle :
-#     for node in ellement:
-#         corrd = np.concatenate((corrd,[no2xyz[node]]),axis = 0)
-        
-#     print(corrd)
-    
-# ax.scatter(corrd[:,0],corrd[:,1],corrd[:,2],marker = 's')
-
-
-
-
-
-
-
-
- 
-    
-
-#hej1 = gmsh.model.mesh.getNodesByElementType(1,tag = 5)
-
-
-
-# hej2 = gmsh.model.mesh.getNodesByElementType(2)
-
-# hej3 = gmsh.model.mesh.getElementsByType(1)
-
-# hej4 = gmsh.model.mesh.getNodesForPhysicalGroup(dim=2, tag=55)
-
-
-
-#hej6 = gmsh.model.mesh.getEdges([1, 29])
-
-#A = np.reshape(hej[1],(len(hej[0]),3))
-
-
-
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-# ax.scatter(A[:,0],A[:,0],A[:,0])
-
-# if '-nopopup' not in sys.argv:
-#     gmsh.fltk.run()

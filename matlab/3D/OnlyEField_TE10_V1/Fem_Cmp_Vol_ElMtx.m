@@ -3,7 +3,7 @@
 % numerical integration on the reference element
 % --------------------------------------------------------------
 function [KElMtx_EE] = ...
-    Fem_Cmp_Vol_ElMtx(xyz, ma2er, ma2si, k0)
+    Fem_Cmp_Vol_ElMtx(xyz, ma2er, ma2mu, k0)
 
 % Argument:
 %   xyz = the coordinates of the nodes of the element
@@ -91,7 +91,7 @@ end
 % K_{ij}
 for iIdx = 1:6
     for jIdx = 1:6
-        mu = ones(size(q2w));
+        mu = ma2mu(q2x(1,:),q2x(2,:),q2x(3,:));
         er = ma2er(q2x(1,:),q2x(2,:),q2x(3,:));
         ipTmp = (1./mu).*sum(gcn{iIdx}.*gcn{jIdx} - (k0^2)*er.*gin{iIdx}.* gin{jIdx});
         KElMtx_EE(iIdx,jIdx) = ipTmp * q2w' * det_jac;
